@@ -1,0 +1,10 @@
+# OS generated files
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Node dependencies
+node_modules/
