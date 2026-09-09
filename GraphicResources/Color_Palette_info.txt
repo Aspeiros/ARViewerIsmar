@@ -1,0 +1,19 @@
+Color Palette:
+ 
+Strokes, line, text
+#3D1209  Dark brown
+#006DF2  Blue texts
+ 
+Logo
+#FFE000  Yellow
+#FFAA00  Orange
+#EA5454  Red
+#008BF2  Blue
+ 
+Background
+#F4E8D4  Beige
+ 
+Gradient background
+#F7D3CB Beige Red
+#F4E8D4 Beige
+#FFF0B3 Beige Yellow

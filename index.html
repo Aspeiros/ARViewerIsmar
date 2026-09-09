@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#008BF2" />
+    <meta name="description" content="Esperienza AR per ISMAR 2026" />
+    <title>ISMAR 2026 · AR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="experience" aria-live="polite">
+      <video id="camera" autoplay playsinline muted aria-label="Anteprima della fotocamera"></video>
+      <canvas id="capture-canvas" hidden></canvas>
+
+      <section class="start-screen" id="start-screen">
+        <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+        <div class="start-copy">
+          <p class="eyebrow">XR venue experience</p>
+          <h1>Scopri il contenuto nascosto.</h1>
+          <p>Inquadra il QR/marker e guarda l’esperienza prendere vita.</p>
+        </div>
+        <button class="primary-button" id="start-button" type="button">Apri la fotocamera</button>
+        <p class="privacy-note">La fotocamera resta sul tuo dispositivo: nessuna immagine viene caricata.</p>
+      </section>
+
+      <section class="camera-ui" id="camera-ui" hidden>
+        <header class="camera-header">
+          <img src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+          <button class="icon-button" id="switch-camera" type="button" aria-label="Cambia fotocamera" title="Cambia fotocamera">↺</button>
+        </header>
+
+        <div class="tracking-hint" id="tracking-hint">
+          <span class="tracking-dot"></span>
+          <span id="tracking-text">Cerca il marker ISMAR</span>
+        </div>
+
+        <div class="marker-guide" id="marker-guide" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <article class="ar-content" id="ar-content" hidden>
+          <span class="ar-spark ar-spark-one">✦</span>
+          <span class="ar-spark ar-spark-two">✦</span>
+          <div class="ar-orb">AR</div>
+          <div>
+            <p class="ar-kicker">ISMAR 2026</p>
+            <h2 id="content-title">Welcome to Bari</h2>
+            <p id="content-description">La tua esperienza XR inizia qui.</p>
+          </div>
+        </article>
+
+        <nav class="camera-controls" aria-label="Controlli fotocamera">
+          <button class="frame-toggle is-active" id="frame-toggle" type="button" aria-pressed="true">
+            <span class="frame-swatch" aria-hidden="true"></span>
+            Frame ISMAR
+          </button>
+          <button class="shutter" id="capture-button" type="button" aria-label="Scatta una foto">
+            <span></span>
+          </button>
+          <button class="secondary-control" id="reset-marker" type="button">Ricalibra</button>
+        </nav>
+      </section>
+
+      <section class="photo-preview" id="photo-preview" hidden>
+        <img id="photo-result" alt="La tua foto AR ISMAR 2026" />
+        <div class="preview-actions">
+          <button class="secondary-button" id="retake-button" type="button">Ripeti</button>
+          <button class="primary-button" id="save-button" type="button">Salva foto</button>
+        </div>
+      </section>
+
+      <p class="message" id="message" role="status"></p>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

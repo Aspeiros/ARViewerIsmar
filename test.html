@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ISMAR 2026 · Test marker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tsukimi+Rounded:wght@600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root { font-family: Poppins, Arial, sans-serif; color: #3d1209; background: #f4e8d4; }
+      * { box-sizing: border-box; } body { margin: 0; min-width: 320px; }
+      main { min-height: 100vh; display: grid; place-items: center; padding: 30px; background: radial-gradient(circle at 86% 12%, #fff0b3, transparent 28%), linear-gradient(145deg, #f7d3cb, #f4e8d4 60%, #fff0b3); }
+      .card { width: min(560px, 100%); padding: clamp(25px, 6vw, 46px); text-align: center; border: 2px solid #3d1209; border-radius: 25px; background: #fffdf8cc; box-shadow: 8px 8px 0 #3d1209; }
+      img { width: min(280px, 80%); margin-bottom: 20px; } h1 { margin: 0 0 12px; font: 700 clamp(28px, 5vw, 45px)/1.08 "Tsukimi Rounded", Poppins, sans-serif; }
+      p { max-width: 400px; margin: 0 auto 20px; line-height: 1.6; } #qr { display: grid; place-items: center; width: min(310px, 78vw); aspect-ratio: 1; padding: 18px; margin: 25px auto 16px; border: 10px solid #ffe000; background: white; }
+      #qr img, #qr canvas { width: 100%; height: 100%; margin: 0; image-rendering: pixelated; } .url { overflow-wrap: anywhere; color: #006df2; font-size: 12px; } .tip { margin-bottom: 0; font-size: 13px; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card">
+        <img src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+        <h1>Test marker AR</h1>
+        <p>Lascia questa pagina aperta sul computer. Dal telefono inquadra il QR, apri il link e poi punta di nuovo qui la fotocamera.</p>
+        <div id="qr" aria-label="QR code per aprire la demo AR"></div>
+        <p class="url" id="url"></p>
+        <p class="tip">Suggerimento: aumenta la luminosità dello schermo per un riconoscimento più rapido.</p>
+      </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      const destination = `${window.location.origin}/?content=welcome`;
+      document.querySelector('#url').textContent = destination;
+      new QRCode(document.querySelector('#qr'), { text: destination, width: 512, height: 512, correctLevel: QRCode.CorrectLevel.H });
+    </script>
+  </body>
+</html>

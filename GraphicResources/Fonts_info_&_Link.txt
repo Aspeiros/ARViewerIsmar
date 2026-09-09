@@ -1,0 +1,9 @@
+Fonts ISMAR 2026
+
+Headings: Tsukimi rounded (google fonts)
+Link: 
+https://fonts.google.com/specimen/Tsukimi+Rounded
+
+Others: Poppins (google fonts)
+Link: 
+https://fonts.google.com/specimen/Poppins

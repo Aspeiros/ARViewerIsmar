@@ -1,0 +1,8 @@
+{
+  "name": "ismar-2026-ar-demo",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "serve": "node server.mjs"
+  }
+}
