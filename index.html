@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=3" />
+    <link rel="stylesheet" href="./src/styles.css?v=4" />
   </head>
   <body>
     <main class="experience" aria-live="polite">
@@ -28,14 +28,29 @@
       </nav>
 
       <section class="start-screen" id="start-screen">
-        <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
-        <div class="start-copy">
-          <p class="eyebrow" data-i18n="eyebrow">XR venue experience</p>
-          <h1 data-i18n="startTitle">Discover the hidden content.</h1>
-          <p data-i18n="startDesc">Scan the QR/marker and watch the experience come to life.</p>
+        <div class="start-content">
+          <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+          <div class="start-copy">
+            <p class="eyebrow" data-i18n="eyebrow">AR·E YOU READY TO EXPLORE?</p>
+            <h1 data-i18n="startTitle">Discover what's <span class="ar-highlight">AR</span>ound you.</h1>
+            <div class="steps-guide">
+              <div class="step-item">
+                <span class="step-num">1</span>
+                <p data-i18n="startStep1">Tap <strong>"Open camera"</strong> below</p>
+              </div>
+              <div class="step-item">
+                <span class="step-num">2</span>
+                <p data-i18n="startStep2">Aim your phone <strong>back at the QR code</strong> on the poster to unlock AR!</p>
+              </div>
+            </div>
+          </div>
+          <button class="primary-button" id="start-button" type="button" data-i18n="startButton">Open camera</button>
+          <p class="privacy-note" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
         </div>
-        <button class="primary-button" id="start-button" type="button" data-i18n="startButton">Open camera</button>
-        <p class="privacy-note" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
+
+        <div class="start-bottom-frame" aria-hidden="true">
+          <img src="./GraphicResources/Website_materials/Illustration_Visual_Identity/Illustration_Visual_Identity.svg" alt="" />
+        </div>
       </section>
 
       <section class="camera-ui" id="camera-ui" hidden>
@@ -86,6 +101,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=3"></script>
+    <script type="module" src="./src/app.js?v=4"></script>
   </body>
 </html>
