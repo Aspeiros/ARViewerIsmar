@@ -30,7 +30,8 @@
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-      const destination = `${window.location.origin}/?content=welcome`;
+      const basePath = window.location.pathname.replace(/\/test\.html.*$/, '/');
+      const destination = `${window.location.origin}${basePath}?content=welcome`;
       document.querySelector('#url').textContent = destination;
       new QRCode(document.querySelector('#qr'), { text: destination, width: 512, height: 512, correctLevel: QRCode.CorrectLevel.H });
     </script>
