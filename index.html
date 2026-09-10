@@ -1,41 +1,52 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#008BF2" />
-    <meta name="description" content="Esperienza AR per ISMAR 2026" />
+    <meta name="description" content="AR Experience for ISMAR 2026" />
     <title>ISMAR 2026 · AR</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=2" />
+    <link rel="stylesheet" href="./src/styles.css?v=3" />
   </head>
   <body>
     <main class="experience" aria-live="polite">
-      <video id="camera" autoplay playsinline muted aria-label="Anteprima della fotocamera"></video>
+      <video id="camera" autoplay playsinline muted aria-label="Camera preview"></video>
       <canvas id="capture-canvas" hidden></canvas>
+
+      <nav class="lang-bar" id="lang-bar" aria-label="Select language">
+        <button class="lang-btn is-active" data-lang="en" type="button" title="English" aria-label="English">🇬🇧</button>
+        <button class="lang-btn" data-lang="it" type="button" title="Italiano" aria-label="Italiano">🇮🇹</button>
+        <button class="lang-btn" data-lang="de" type="button" title="Deutsch" aria-label="Deutsch">🇩🇪</button>
+        <button class="lang-btn" data-lang="es" type="button" title="Español" aria-label="Español">🇪🇸</button>
+        <button class="lang-btn" data-lang="fr" type="button" title="Français" aria-label="Français">🇫🇷</button>
+        <button class="lang-btn" data-lang="zh" type="button" title="中文" aria-label="中文">🇨🇳</button>
+        <button class="lang-btn" data-lang="ja" type="button" title="日本語" aria-label="日本語">🇯🇵</button>
+        <button class="lang-btn" data-lang="ko" type="button" title="한국어" aria-label="한국어">🇰🇷</button>
+      </nav>
 
       <section class="start-screen" id="start-screen">
         <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
         <div class="start-copy">
-          <p class="eyebrow">XR venue experience</p>
-          <h1>Scopri il contenuto nascosto.</h1>
-          <p>Inquadra il QR/marker e guarda l’esperienza prendere vita.</p>
+          <p class="eyebrow" data-i18n="eyebrow">XR venue experience</p>
+          <h1 data-i18n="startTitle">Discover the hidden content.</h1>
+          <p data-i18n="startDesc">Scan the QR/marker and watch the experience come to life.</p>
         </div>
-        <button class="primary-button" id="start-button" type="button">Apri la fotocamera</button>
-        <p class="privacy-note">La fotocamera resta sul tuo dispositivo: nessuna immagine viene caricata.</p>
+        <button class="primary-button" id="start-button" type="button" data-i18n="startButton">Open camera</button>
+        <p class="privacy-note" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
       </section>
 
       <section class="camera-ui" id="camera-ui" hidden>
         <header class="camera-header">
           <img src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
-          <button class="icon-button" id="switch-camera" type="button" aria-label="Cambia fotocamera" title="Cambia fotocamera">↺</button>
+          <button class="icon-button" id="switch-camera" type="button" aria-label="Switch camera" title="Switch camera">↺</button>
         </header>
 
         <div class="tracking-hint" id="tracking-hint">
           <span class="tracking-dot"></span>
-          <span id="tracking-text">Cerca il marker ISMAR</span>
+          <span id="tracking-text" data-i18n="trackingHintLooking">Look for the ISMAR marker</span>
         </div>
 
         <div class="marker-guide" id="marker-guide" aria-hidden="true">
@@ -49,32 +60,32 @@
           <div>
             <p class="ar-kicker">ISMAR 2026</p>
             <h2 id="content-title">Welcome to Bari</h2>
-            <p id="content-description">La tua esperienza XR inizia qui.</p>
+            <p id="content-description">Your XR venue journey starts here.</p>
           </div>
         </article>
 
-        <nav class="camera-controls" aria-label="Controlli fotocamera">
+        <nav class="camera-controls" aria-label="Camera controls">
           <button class="frame-toggle is-active" id="frame-toggle" type="button" aria-pressed="true">
             <span class="frame-swatch" aria-hidden="true"></span>
-            Frame ISMAR
+            <span id="frame-toggle-text" data-i18n="frameToggle">ISMAR Frame</span>
           </button>
-          <button class="shutter" id="capture-button" type="button" aria-label="Scatta una foto">
+          <button class="shutter" id="capture-button" type="button" aria-label="Take photo">
             <span></span>
           </button>
-          <button class="secondary-control" id="reset-marker" type="button">Ricalibra</button>
+          <button class="secondary-control" id="reset-marker" type="button" data-i18n="recalibrate">Recalibrate</button>
         </nav>
       </section>
 
       <section class="photo-preview" id="photo-preview" hidden>
-        <img id="photo-result" alt="La tua foto AR ISMAR 2026" />
+        <img id="photo-result" alt="ISMAR 2026 AR Photo" />
         <div class="preview-actions">
-          <button class="secondary-button" id="retake-button" type="button">Ripeti</button>
-          <button class="primary-button" id="save-button" type="button">Salva foto</button>
+          <button class="secondary-button" id="retake-button" type="button" data-i18n="retake">Retake</button>
+          <button class="primary-button" id="save-button" type="button" data-i18n="savePhoto">Save photo</button>
         </div>
       </section>
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=2"></script>
+    <script type="module" src="./src/app.js?v=3"></script>
   </body>
 </html>
