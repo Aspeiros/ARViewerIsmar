@@ -26,7 +26,8 @@ button { font: inherit; cursor: pointer; }
   padding: max(68px, calc(env(safe-area-inset-top) + 54px)) 24px max(20px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 20px;
   background: radial-gradient(circle at 90% 12%, #fff0b3 0 8%, transparent 31%), linear-gradient(145deg, #f7d3cb, var(--beige) 62%, #fff0b3);
   overflow: hidden;
 }
@@ -41,29 +42,16 @@ button { font: inherit; cursor: pointer; }
   max-width: 520px;
 }
 
-.start-bottom-frame {
+.start-bg-rooster {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
+  bottom: 14px;
+  right: 12px;
+  width: min(58vw, 250px);
+  height: auto;
   pointer-events: none;
   z-index: 1;
-  line-height: 0;
-  overflow: hidden;
-}
-
-.start-bottom-frame img {
-  width: 100%;
-  max-width: 560px;
-  height: auto;
-  max-height: 155px;
-  margin-left: auto;
-  display: block;
-  object-fit: contain;
-  object-position: bottom right;
-  opacity: 0.52;
-  filter: drop-shadow(0 -2px 8px rgba(61, 18, 9, 0.06));
+  opacity: 0.26;
+  filter: drop-shadow(0 4px 14px rgba(61, 18, 9, 0.08));
 }
 
 .brand-logo { width: min(300px, 78vw); height: auto; }

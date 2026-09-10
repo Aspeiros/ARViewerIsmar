@@ -3,16 +3,16 @@
     eyebrow: "AR·E YOU READY TO EXPLORE?",
     startTitle: "Discover what's <span class=\"ar-highlight\">AR</span>ound you.",
     startStep1: "Tap <strong>\"Open camera\"</strong> below",
-    startStep2: "Aim your phone <strong>back at the QR code</strong> on the poster to unlock AR!",
+    startStep2: "Aim your phone <strong>back at the QR code</strong> to unlock AR!",
     startButton: "Open camera",
     privacyNote: "The camera stays on your device: no images are uploaded.",
     switchCameraTitle: "Switch camera",
-    trackingHintLooking: "Aim at the QR code on the poster",
+    trackingHintLooking: "Aim at the QR code",
     trackingHintFound: "QR detected!",
-    contentHint: "Aim at the QR code on the poster to activate AR.",
+    contentHint: "Aim at the QR code to activate AR.",
     contentFallbackHint: "Keep the QR code in the center of the screen.",
     photoSuccessHint: "AR content active! Tap the white button to take a photo.",
-    pointAgainHint: "Aim back at the QR code on the poster.",
+    pointAgainHint: "Aim back at the QR code.",
     frameToggle: "ISMAR Frame",
     recalibrate: "Recalibrate",
     retake: "Retake",
@@ -25,23 +25,23 @@
     contents: {
       welcome: { title: "Welcome to Bari", description: "Your XR venue journey starts here." },
       food: { title: "Taste Puglia", description: "An augmented voyage through local flavors and traditions." },
-      venue: { title: "Explore the Venue", description: "Look beyond the poster: this is just the beginning." }
+      venue: { title: "Explore the Venue", description: "Look beyond: this is just the beginning." }
     }
   },
   it: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "Scopri cosa c'è <span class=\"ar-highlight\">AR</span>torno a te.",
     startStep1: "Tocca <strong>\"Apri la fotocamera\"</strong> qui sotto",
-    startStep2: "Punta di nuovo verso il <strong>QR code sul poster</strong> per attivare l'AR!",
+    startStep2: "Punta di nuovo verso il <strong>codice QR</strong> per attivare l'AR!",
     startButton: "Apri la fotocamera",
     privacyNote: "La fotocamera resta sul tuo dispositivo: nessuna immagine viene caricata.",
     switchCameraTitle: "Cambia fotocamera",
-    trackingHintLooking: "Inquadra il QR code sul poster",
+    trackingHintLooking: "Inquadra il codice QR",
     trackingHintFound: "QR riconosciuto!",
-    contentHint: "Inquadra il codice QR sul poster per attivare l'AR.",
+    contentHint: "Inquadra il codice QR per attivare l'AR.",
     contentFallbackHint: "Tieni il codice QR al centro dell'inquadratura.",
     photoSuccessHint: "Contenuto AR attivo! Tocca il pulsante bianco per la foto.",
-    pointAgainHint: "Punta di nuovo verso il codice QR sul poster.",
+    pointAgainHint: "Punta di nuovo verso il codice QR.",
     frameToggle: "Frame ISMAR",
     recalibrate: "Ricalibra",
     retake: "Ripeti",
@@ -54,23 +54,23 @@
     contents: {
       welcome: { title: "Welcome to Bari", description: "La tua esperienza XR inizia qui." },
       food: { title: "Taste Puglia", description: "Un viaggio aumentato tra sapori e tradizioni." },
-      venue: { title: "Explore the venue", description: "Guarda oltre il poster: questo è solo l'inizio." }
+      venue: { title: "Explore the venue", description: "Guarda oltre: questo è solo l'inizio." }
     }
   },
   de: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "Entdecke, was <span class=\"ar-highlight\">AR</span>temberaubend um dich ist.",
     startStep1: "Tippe unten auf <strong>\"Kamera öffnen\"</strong>",
-    startStep2: "Richte das Smartphone <strong>wieder auf den QR-Code</strong> auf dem Poster!",
+    startStep2: "Richte das Smartphone <strong>wieder auf den QR-Code</strong>!",
     startButton: "Kamera öffnen",
     privacyNote: "Die Kamera bleibt auf deinem Gerät: keine Bilder werden hochgeladen.",
     switchCameraTitle: "Kamera wechseln",
-    trackingHintLooking: "QR-Code auf dem Poster anvisieren",
+    trackingHintLooking: "QR-Code anvisieren",
     trackingHintFound: "QR-Code erkannt!",
-    contentHint: "QR-Code auf dem Poster erfassen, um AR zu aktivieren.",
+    contentHint: "QR-Code erfassen, um AR zu aktivieren.",
     contentFallbackHint: "Halte den QR-Code in der Mitte des Bildschirms.",
     photoSuccessHint: "AR-Inhalt aktiv! Tippe auf den weißen Knopf für ein Foto.",
-    pointAgainHint: "QR-Code auf dem Poster erneut anvisieren.",
+    pointAgainHint: "QR-Code erneut anvisieren.",
     frameToggle: "ISMAR-Rahmen",
     recalibrate: "Neukalibrieren",
     retake: "Wiederholen",
@@ -83,23 +83,23 @@
     contents: {
       welcome: { title: "Willkommen in Bari", description: "Deine XR-Erfahrung beginnt hier." },
       food: { title: "Geschmack Apuliens", description: "Eine AR-Reise durch Spezialitäten und Traditionen." },
-      venue: { title: "Veranstaltungsort erkunden", description: "Blicke über das Poster hinaus: das ist erst der Anfang." }
+      venue: { title: "Veranstaltungsort erkunden", description: "Blicke über das Gewohnte hinaus: das ist erst der Anfang." }
     }
   },
   es: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "Descubre lo que hay a tu <span class=\"ar-highlight\">AR</span>·rededor.",
     startStep1: "Toca <strong>\"Abrir cámara\"</strong> abajo",
-    startStep2: "¡Apunta de nuevo al <strong>código QR en el póster</strong> para activar el AR!",
+    startStep2: "¡Apunta de nuevo al <strong>código QR</strong> para activar el AR!",
     startButton: "Abrir cámara",
     privacyNote: "La cámara funciona en tu dispositivo: no se sube ninguna imagen.",
     switchCameraTitle: "Cambiar cámara",
-    trackingHintLooking: "Enfoca el código QR en el póster",
+    trackingHintLooking: "Enfoca el código QR",
     trackingHintFound: "¡QR detectado!",
-    contentHint: "Enfoca el código QR en el póster para activar el contenido AR.",
+    contentHint: "Enfoca el código QR para activar el contenido AR.",
     contentFallbackHint: "Mantén el código QR en el centro de la pantalla.",
     photoSuccessHint: "¡Contenido AR activo! Toca el botón blanco para tomar la foto.",
-    pointAgainHint: "Apunta nuevamente al código QR en el póster.",
+    pointAgainHint: "Apunta nuevamente al código QR.",
     frameToggle: "Marco ISMAR",
     recalibrate: "Recalibrar",
     retake: "Repetir",
@@ -112,23 +112,23 @@
     contents: {
       welcome: { title: "Bienvenido a Bari", description: "Tu viaje XR comienza aquí." },
       food: { title: "Sabores de Puglia", description: "Un viaje aumentado por los sabores y tradiciones locales." },
-      venue: { title: "Explora la sede", description: "Mira más allá del póster: esto es solo el comienzo." }
+      venue: { title: "Explora la sede", description: "Mira más allá: esto es solo el comienzo." }
     }
   },
   fr: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "Découvrez ce qui vous entou-<span class=\"ar-highlight\">AR</span>-e.",
     startStep1: "Touchez <strong>\"Ouvrir la caméra\"</strong> ci-dessous",
-    startStep2: "Pointez à nouveau vers le <strong>QR code sur l'affiche</strong> pour activer l'AR !",
+    startStep2: "Pointez à nouveau vers le <strong>QR code</strong> pour activer l'AR !",
     startButton: "Ouvrir la caméra",
     privacyNote: "La caméra reste sur votre appareil : aucune image n'est transférée.",
     switchCameraTitle: "Changer de caméra",
-    trackingHintLooking: "Visez le code QR sur l'affiche",
+    trackingHintLooking: "Visez le code QR",
     trackingHintFound: "QR code détecté !",
-    contentHint: "Visez le code QR sur l'affiche pour activer l'AR.",
+    contentHint: "Visez le code QR pour activer l'AR.",
     contentFallbackHint: "Gardez le code QR au centre de l'écran.",
     photoSuccessHint: "Contenu AR actif ! Touchez le bouton blanc pour prendre une photo.",
-    pointAgainHint: "Pointez à nouveau vers le code QR sur l'affiche.",
+    pointAgainHint: "Pointez à nouveau vers le code QR.",
     frameToggle: "Cadre ISMAR",
     recalibrate: "Recalibrer",
     retake: "Recommencer",
@@ -141,23 +141,23 @@
     contents: {
       welcome: { title: "Bienvenue à Bari", description: "Votre voyage XR commence ici." },
       food: { title: "Saveurs des Pouilles", description: "Un voyage augmenté à travers saveurs et traditions locales." },
-      venue: { title: "Explorer le lieu", description: "Regardez au-delà de l'affiche : ce n'est que le début." }
+      venue: { title: "Explorer le lieu", description: "Regardez au-delà : ce n'est que le début." }
     }
   },
   zh: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "探索身边的 <span class=\"ar-highlight\">AR</span> 精彩无限。",
     startStep1: "点击下方的 <strong>“开启摄像头”</strong>",
-    startStep2: "<strong>重新对准海报上的二维码</strong>，即刻解锁 AR 体验！",
+    startStep2: "<strong>重新对准二维码</strong>，即刻解锁 AR 体验！",
     startButton: "开启摄像头",
     privacyNote: "摄像头仅在本地运行：不会上传任何图片。",
     switchCameraTitle: "切换摄像头",
-    trackingHintLooking: "请对准海报上的二维码",
+    trackingHintLooking: "请对准二维码",
     trackingHintFound: "已识别二维码！",
-    contentHint: "请对准海报上的二维码以激活 AR 内容。",
+    contentHint: "请对准二维码以激活 AR 内容。",
     contentFallbackHint: "请将二维码保持在屏幕中央。",
     photoSuccessHint: "AR 内容已激活！点击白色按钮拍照留念。",
-    pointAgainHint: "请重新对准海报上的二维码。",
+    pointAgainHint: "请重新对准二维码。",
     frameToggle: "ISMAR 边框",
     recalibrate: "重新校准",
     retake: "重拍",
@@ -170,23 +170,23 @@
     contents: {
       welcome: { title: "欢迎来到巴里", description: "您的 XR 之旅从这里正式开启。" },
       food: { title: "品味普利亚", description: "沉浸式探索普利亚地道美食与历史风情。" },
-      venue: { title: "探索大会会场", description: "突破海报边界：精彩体验才刚刚拉开序幕。" }
+      venue: { title: "探索大会会场", description: "突破视野边界：精彩体验才刚刚拉开序幕。" }
     }
   },
   ja: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "身の回りの <span class=\"ar-highlight\">AR</span> 体験を発見。",
     startStep1: "下の <strong>「カメラを起動」</strong> をタップ",
-    startStep2: "ポスターの <strong>QRコードに再びカメラを向けて</strong> ARを起動！",
+    startStep2: "<strong>QRコードに再びカメラを向けて</strong> ARを起動！",
     startButton: "カメラを起動",
     privacyNote: "カメラ映像はお使いの端末内でのみ処理され、外部には送信されません。",
     switchCameraTitle: "カメラを切り替え",
-    trackingHintLooking: "ポスターのQRコードを映してください",
+    trackingHintLooking: "QRコードを画面に合わせてください",
     trackingHintFound: "QRコードを認識しました！",
-    contentHint: "ポスターのQRコードを画面に合わせてARを起動してください。",
+    contentHint: "QRコードを画面に合わせてARを起動してください。",
     contentFallbackHint: "QRコードを画面の中央に合わせてください。",
     photoSuccessHint: "ARコンテンツ表示中！白いボタンを押して撮影できます。",
-    pointAgainHint: "もう一度ポスターのQRコードに合わせてください。",
+    pointAgainHint: "もう一度QRコードに合わせてください。",
     frameToggle: "ISMARフレーム",
     recalibrate: "再調整",
     retake: "撮り直す",
@@ -199,23 +199,23 @@
     contents: {
       welcome: { title: "バーリへようこそ", description: "ここからあなたのXRの旅が始まります。" },
       food: { title: "プーリアの美味", description: "地域の伝統と美食をめぐるARツアー。" },
-      venue: { title: "会場を探検", description: "ポスターの先へ：体験はここから広がります。" }
+      venue: { title: "会場を探検", description: "枠を超えて：体験はここから広がります。" }
     }
   },
   ko: {
     eyebrow: "AR·E YOU READY?",
     startTitle: "주변의 특별한 <span class=\"ar-highlight\">AR</span> 경험을 발견하세요.",
     startStep1: "아래 <strong>'카메라 시작'</strong> 버튼 터치",
-    startStep2: "포스터의 <strong>QR 코드를 다시 비춰</strong> 증강현실을 활성화하세요!",
+    startStep2: "<strong>QR 코드를 다시 비춰</strong> 증강현실을 활성화하세요!",
     startButton: "카메라 시작",
     privacyNote: "카메라 화면은 기기 내에서만 안전하게 처리되며 업로드되지 않습니다.",
     switchCameraTitle: "카메라 전환",
-    trackingHintLooking: "포스터의 QR 코드를 비춰주세요",
+    trackingHintLooking: "QR 코드를 비춰주세요",
     trackingHintFound: "QR 코드 감지됨!",
-    contentHint: "포스터의 QR 코드를 비춰 AR을 활성화하세요.",
+    contentHint: "QR 코드를 비춰 AR을 활성화하세요.",
     contentFallbackHint: "QR 코드를 화면 중앙에 맞춰주세요.",
     photoSuccessHint: "AR 콘텐츠 활성화됨! 흰색 버튼을 눌러 사진을 촬영하세요.",
-    pointAgainHint: "포스터의 QR 코드를 다시 비춰주세요.",
+    pointAgainHint: "QR 코드를 다시 비춰주세요.",
     frameToggle: "ISMAR 프레임",
     recalibrate: "재보정",
     retake: "다시 촬영",
@@ -228,7 +228,7 @@
     contents: {
       welcome: { title: "바리에 오신 것을 환영합니다", description: "당신의 특별한 XR 여정이 여기서 시작됩니다." },
       food: { title: "풀리아의 맛", description: "현지 미식과 전통을 만나는 증강현실 여행." },
-      venue: { title: "행사장 둘러보기", description: "포스터 너머의 세계: 이제 시작입니다." }
+      venue: { title: "행사장 둘러보기", description: "그 너머의 세계: 이제 시작입니다." }
     }
   }
 };
