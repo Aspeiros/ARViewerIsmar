@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "serve": "node server.mjs"
+    "serve": "node server.mjs",
+    "qr": "node scripts/generate_qr.mjs"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
   }
 }

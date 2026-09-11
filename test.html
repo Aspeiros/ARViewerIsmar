@@ -36,6 +36,17 @@
 
         <div class="controls">
           <div class="control-group">
+            <label for="mode-select">QR Target:</label>
+            <select id="mode-select">
+              <option value="media" selected>Media File (GIF / Image / 3D)</option>
+              <option value="station">Preset Station (Content)</option>
+            </select>
+          </div>
+          <div class="control-group" id="group-media">
+            <label for="media-input">Media File Path:</label>
+            <input type="text" id="media-input" value="media/images/Logo_Animated.gif" style="padding: 8px 12px; border: 2px solid #3d1209; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 600; width: 250px;" />
+          </div>
+          <div class="control-group" id="group-station" style="display: none;">
             <label for="content-select">Venue Station:</label>
             <select id="content-select">
               <option value="welcome" selected>Welcome to Bari (General)</option>
@@ -44,7 +55,7 @@
             </select>
           </div>
           <div class="control-group">
-            <label for="lang-select">Preset Language:</label>
+            <label for="lang-select">Language:</label>
             <select id="lang-select">
               <option value="en" selected>English 🇬🇧 (Default)</option>
               <option value="it">Italiano 🇮🇹</option>
@@ -72,16 +83,34 @@
     <script>
       const qrContainer = document.querySelector('#qr');
       const urlText = document.querySelector('#url');
+      const modeSelect = document.querySelector('#mode-select');
+      const groupMedia = document.querySelector('#group-media');
+      const groupStation = document.querySelector('#group-station');
+      const mediaInput = document.querySelector('#media-input');
       const contentSelect = document.querySelector('#content-select');
       const langSelect = document.querySelector('#lang-select');
       const downloadBtn = document.querySelector('#download-btn');
       let qrInstance = null;
 
+      function updateMode() {
+        const isMedia = modeSelect.value === 'media';
+        groupMedia.style.display = isMedia ? 'flex' : 'none';
+        groupStation.style.display = isMedia ? 'none' : 'flex';
+        updateQR();
+      }
+
       function updateQR() {
         const basePath = window.location.pathname.replace(/\/test\.html.*$/, '/');
-        const content = contentSelect.value;
         const lang = langSelect.value;
-        const destination = `${window.location.origin}${basePath}?content=${content}&lang=${lang}`;
+        let destination = '';
+
+        if (modeSelect.value === 'media') {
+          const media = encodeURI(mediaInput.value.trim());
+          destination = `${window.location.origin}${basePath}?media=${media}&lang=${lang}`;
+        } else {
+          const content = contentSelect.value;
+          destination = `${window.location.origin}${basePath}?content=${content}&lang=${lang}`;
+        }
 
         urlText.textContent = destination;
         qrContainer.innerHTML = '';
@@ -89,10 +118,14 @@
           text: destination,
           width: 512,
           height: 512,
+          colorDark: '#3D1209',
+          colorLight: '#FFFFFF',
           correctLevel: QRCode.CorrectLevel.H
         });
       }
 
+      modeSelect.addEventListener('change', updateMode);
+      mediaInput.addEventListener('input', updateQR);
       contentSelect.addEventListener('change', updateQR);
       langSelect.addEventListener('change', updateQR);
 
@@ -103,11 +136,12 @@
         if (!source) return;
         const a = document.createElement('a');
         a.href = source;
-        a.download = `ISMAR2026-QR-${contentSelect.value}-${langSelect.value}.png`;
+        const nameSuffix = modeSelect.value === 'media' ? (mediaInput.value.split('/').pop().replace(/\.[^/.]+$/, '')) : contentSelect.value;
+        a.download = `ISMAR2026-QR-${nameSuffix}-${langSelect.value}.png`;
         a.click();
       });
 
-      updateQR();
+      updateMode();
     </script>
   </body>
 </html>

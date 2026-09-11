@@ -1,4 +1,4 @@
-﻿export const translations = {
+export const translations = {
   en: {
     eyebrow: "AR·E YOU READY TO EXPLORE?",
     startTitle: "Discover what's <span class=\"ar-highlight\">AR</span>ound you.",
@@ -22,6 +22,7 @@
     cameraStarting: "Camera is starting: please wait a moment and try again.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "Augmented Reality Experience",
     contents: {
       welcome: { title: "Welcome to Bari", description: "Your XR venue journey starts here." },
       food: { title: "Taste Puglia", description: "An augmented voyage through local flavors and traditions." },
@@ -51,6 +52,7 @@
     cameraStarting: "La fotocamera si sta avviando: attendi un istante e riprova.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "Esperienza in Realtà Aumentata",
     contents: {
       welcome: { title: "Welcome to Bari", description: "La tua esperienza XR inizia qui." },
       food: { title: "Taste Puglia", description: "Un viaggio aumentato tra sapori e tradizioni." },
@@ -80,6 +82,7 @@
     cameraStarting: "Kamera startet: bitte kurz warten und erneut versuchen.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "Augmented-Reality-Erlebnis",
     contents: {
       welcome: { title: "Willkommen in Bari", description: "Deine XR-Erfahrung beginnt hier." },
       food: { title: "Geschmack Apuliens", description: "Eine AR-Reise durch Spezialitäten und Traditionen." },
@@ -109,6 +112,7 @@
     cameraStarting: "La cámara se está iniciando: espera un instante y vuelve a intentarlo.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "Experiencia de Realidad Aumentada",
     contents: {
       welcome: { title: "Bienvenido a Bari", description: "Tu viaje XR comienza aquí." },
       food: { title: "Sabores de Puglia", description: "Un viaje aumentado por los sabores y tradiciones locales." },
@@ -138,6 +142,7 @@
     cameraStarting: "La caméra démarre : veuillez patienter un instant et réessayer.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "Expérience de Réalité Augmentée",
     contents: {
       welcome: { title: "Bienvenue à Bari", description: "Votre voyage XR commence ici." },
       food: { title: "Saveurs des Pouilles", description: "Un voyage augmenté à travers saveurs et traditions locales." },
@@ -167,6 +172,7 @@
     cameraStarting: "摄像头正在启动中，请稍候再试。",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "增强现实互动体验",
     contents: {
       welcome: { title: "欢迎来到巴里", description: "您的 XR 之旅从这里正式开启。" },
       food: { title: "品味普利亚", description: "沉浸式探索普利亚地道美食与历史风情。" },
@@ -196,6 +202,7 @@
     cameraStarting: "カメラを起動中です。少々お待ちください。",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "拡張現実インタラクティブ体験",
     contents: {
       welcome: { title: "バーリへようこそ", description: "ここからあなたのXRの旅が始まります。" },
       food: { title: "プーリアの美味", description: "地域の伝統と美食をめぐるARツアー。" },
@@ -225,6 +232,7 @@
     cameraStarting: "카메라를 시작하는 중입니다: 잠시 후 다시 시도해주세요.",
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
+    mediaScanDescription: "증강 현실 인터랙티브 경험",
     contents: {
       welcome: { title: "바리에 오신 것을 환영합니다", description: "당신의 특별한 XR 여정이 여기서 시작됩니다." },
       food: { title: "풀리아의 맛", description: "현지 미식과 전통을 만나는 증강현실 여행." },

@@ -31,8 +31,32 @@ let marker = null;
 const logo = new Image();
 logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
 
+const arOrb = document.querySelector('#ar-orb');
+const arMediaPreview = document.querySelector('#ar-media-preview');
+
 const params = new URLSearchParams(window.location.search);
 const contentKey = params.get('content') || 'welcome';
+const mediaParam = params.get('media');
+
+let mediaImage = null;
+let mediaLoaded = false;
+
+if (mediaParam) {
+  const ext = mediaParam.split('.').pop().toLowerCase();
+  if (['gif', 'png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext)) {
+    if (arOrb && arMediaPreview) {
+      arOrb.hidden = true;
+      arMediaPreview.hidden = false;
+      arMediaPreview.src = mediaParam;
+    }
+    mediaImage = new Image();
+    mediaImage.crossOrigin = 'anonymous';
+    mediaImage.onload = () => {
+      mediaLoaded = true;
+    };
+    mediaImage.src = mediaParam;
+  }
+}
 
 // Default language: English ('en') as requested, with query param and localStorage support
 let currentLang = params.get('lang') || localStorage.getItem('ismar_lang') || 'en';
@@ -44,6 +68,15 @@ function getT() {
 
 function getCurrentContent() {
   const t = getT();
+  if (mediaParam) {
+    const rawName = mediaParam.split('/').pop().replace(/\.[^/.]+$/, '');
+    const cleanName = rawName.replace(/[-_]/g, ' ');
+    const formattedTitle = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    return {
+      title: formattedTitle,
+      description: t.mediaScanDescription || 'Augmented Reality Experience'
+    };
+  }
   return t.contents[contentKey] || t.contents.welcome || { title: 'ISMAR 2026', description: '' };
 }
 
@@ -207,18 +240,33 @@ function drawArCard(context, width, height) {
   roundRect(context, -cardWidth / 2, -cardHeight, cardWidth, cardHeight, 18 * scale);
   context.stroke();
 
-  context.fillStyle = '#ffe000';
-  roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
-  context.fill();
+  if (mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
+    context.save();
+    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
+    context.clip();
+    context.fillStyle = '#ffffff';
+    context.fillRect(-cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale);
+    context.drawImage(mediaImage, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale);
+    context.restore();
 
-  context.strokeStyle = '#3d1209';
-  context.lineWidth = 2 * scale;
-  context.stroke();
+    context.strokeStyle = '#3d1209';
+    context.lineWidth = 2 * scale;
+    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
+    context.stroke();
+  } else {
+    context.fillStyle = '#ffe000';
+    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
+    context.fill();
 
-  context.fillStyle = '#3d1209';
-  context.font = `700 ${17 * scale}px Poppins`;
-  context.textAlign = 'center';
-  context.fillText('AR', -cardWidth / 2 + 41.5 * scale, -cardHeight + 57 * scale);
+    context.strokeStyle = '#3d1209';
+    context.lineWidth = 2 * scale;
+    context.stroke();
+
+    context.fillStyle = '#3d1209';
+    context.font = `700 ${17 * scale}px Poppins`;
+    context.textAlign = 'center';
+    context.fillText('AR', -cardWidth / 2 + 41.5 * scale, -cardHeight + 57 * scale);
+  }
 
   context.textAlign = 'left';
   context.fillStyle = '#008bf2';
