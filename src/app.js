@@ -33,13 +33,43 @@ logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
 
 const arOrb = document.querySelector('#ar-orb');
 const arMediaPreview = document.querySelector('#ar-media-preview');
+const btnZoomIn = document.querySelector('#btn-zoom-in');
+const btnZoomOut = document.querySelector('#btn-zoom-out');
+const btnResetTransform = document.querySelector('#btn-reset-transform');
+const arScaleBadge = document.querySelector('#ar-scale-badge');
 
 const params = new URLSearchParams(window.location.search);
 const contentKey = params.get('content') || 'welcome';
 const mediaParam = params.get('media');
 
+let userOffsetX = 0;
+let userOffsetY = 0;
+let userScale = 1.0;
+let baseAnchorX = window.innerWidth / 2;
+let baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.35);
+let baseAngle = 0;
+
 let mediaImage = null;
 let mediaLoaded = false;
+
+function updateScaleDisplay() {
+  if (arScaleBadge) {
+    arScaleBadge.textContent = `${Math.round(userScale * 100)}%`;
+  }
+}
+
+function applyArTransform() {
+  const posX = baseAnchorX + userOffsetX;
+  const posY = baseAnchorY + userOffsetY;
+  arContent.style.left = `${posX}px`;
+  arContent.style.top = `${posY}px`;
+
+  if (mediaParam) {
+    arContent.style.transform = `translate(-50%, -50%) rotate(${baseAngle}deg) scale(${userScale})`;
+  } else {
+    arContent.style.transform = `translate(-50%, -100%) rotate(${baseAngle}deg) scale(${userScale})`;
+  }
+}
 
 if (mediaParam) {
   const ext = mediaParam.split('.').pop().toLowerCase();
@@ -180,7 +210,7 @@ async function scanForMarker() {
       markerGuide.classList.add('is-hidden');
       trackingHint.classList.add('is-tracking');
       trackingText.textContent = t.trackingHintFound;
-      setMessage(t.photoSuccessHint);
+      setMessage(t.arMoveHint ? `${t.photoSuccessHint} · ${t.arMoveHint}` : t.photoSuccessHint);
     } else if (!marker) {
       arContent.hidden = true;
     }
@@ -203,38 +233,36 @@ function positionContent(points) {
     offsetY = (rect.height - camera.videoHeight * scale) / 2;
   }
   const center = points.reduce((total, point) => ({ x: total.x + point.x, y: total.y + point.y }), { x: 0, y: 0 });
-  const x = offsetX + (center.x / points.length) * scale;
-  const y = offsetY + (center.y / points.length) * scale;
-  const angle = Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x) * (180 / Math.PI);
-  arContent.style.left = `${x}px`;
-  arContent.style.top = `${y}px`;
-  if (mediaParam) {
-    arContent.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
-  } else {
-    arContent.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
-  }
+  baseAnchorX = offsetX + (center.x / points.length) * scale;
+  baseAnchorY = offsetY + (center.y / points.length) * scale;
+  baseAngle = Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x) * (180 / Math.PI);
+  applyArTransform();
 }
 
 function showFallbackMarker() {
   marker = null;
   arContent.hidden = false;
-  arContent.style.left = '50%';
-  if (mediaParam) {
-    arContent.style.top = '48%';
-    arContent.style.transform = 'translate(-50%, -50%)';
-  } else {
-    arContent.style.top = '48%';
-    arContent.style.transform = 'translate(-50%, -100%)';
-  }
+  baseAnchorX = window.innerWidth / 2;
+  baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.35);
+  baseAngle = 0;
+  applyArTransform();
   markerGuide.classList.remove('is-hidden');
 }
 
 function drawArCard(context, width, height) {
+  const rect = camera.getBoundingClientRect();
+  const screenW = rect.width || window.innerWidth;
+  const screenH = rect.height || window.innerHeight;
+  const currentScreenX = baseAnchorX + userOffsetX;
+  const currentScreenY = baseAnchorY + userOffsetY;
+  const canvasTargetX = (currentScreenX / screenW) * width;
+  const canvasTargetY = (currentScreenY / screenH) * height;
+
   if (mediaParam && mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
-    const scale = Math.min(width / 390, height / 844);
-    const mediaSize = Math.min(width * 0.78, height * 0.52);
-    const x = (width - mediaSize) / 2;
-    const y = (height - mediaSize) / 2 - height * 0.04;
+    const scale = Math.min(width / 390, height / 844) * userScale;
+    const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
+    const x = canvasTargetX - mediaSize / 2;
+    const y = canvasTargetY - mediaSize / 2;
 
     context.save();
     context.shadowColor = 'rgba(0, 0, 0, 0.5)';
@@ -246,14 +274,12 @@ function drawArCard(context, width, height) {
   }
 
   const currentContent = getCurrentContent();
-  const x = width * 0.5;
-  const y = height * 0.32;
-  const scale = Math.min(width / 390, height / 844);
+  const scale = Math.min(width / 390, height / 844) * userScale;
   const cardWidth = 292 * scale;
   const cardHeight = 104 * scale;
 
   context.save();
-  context.translate(x, y);
+  context.translate(canvasTargetX, canvasTargetY);
   context.fillStyle = '#3d1209aa';
   roundRect(context, -cardWidth / 2 + 5 * scale, -cardHeight + 7 * scale, cardWidth, cardHeight, 18 * scale);
   context.fill();
@@ -392,8 +418,115 @@ resetMarker.addEventListener('click', () => {
   trackingText.textContent = t.trackingHintLooking;
   markerGuide.classList.remove('is-hidden');
   arContent.hidden = true;
+  userOffsetX = 0;
+  userOffsetY = 0;
+  userScale = 1.0;
+  updateScaleDisplay();
+  applyArTransform();
   setMessage(t.pointAgainHint);
 });
+
+// Gestione Trascinamento AR (Touch & Mouse Drag)
+let isDragging = false;
+let startPointerX = 0, startPointerY = 0;
+let origOffsetX = 0, origOffsetY = 0;
+
+arContent.addEventListener('pointerdown', (e) => {
+  isDragging = true;
+  startPointerX = e.clientX;
+  startPointerY = e.clientY;
+  origOffsetX = userOffsetX;
+  origOffsetY = userOffsetY;
+  arContent.classList.add('is-dragging');
+  arContent.setPointerCapture(e.pointerId);
+});
+
+arContent.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  userOffsetX = origOffsetX + (e.clientX - startPointerX);
+  userOffsetY = origOffsetY + (e.clientY - startPointerY);
+  applyArTransform();
+});
+
+const stopDrag = (e) => {
+  if (!isDragging) return;
+  isDragging = false;
+  arContent.classList.remove('is-dragging');
+  try {
+    arContent.releasePointerCapture(e.pointerId);
+  } catch (err) {}
+};
+
+arContent.addEventListener('pointerup', stopDrag);
+arContent.addEventListener('pointercancel', stopDrag);
+
+// Pinch-to-zoom (2 dita su schermo touch)
+let initialPinchDist = 0;
+let initialPinchScale = 1.0;
+
+window.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    const p1 = e.touches[0];
+    const p2 = e.touches[1];
+    initialPinchDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+    initialPinchScale = userScale;
+  }
+}, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2 && initialPinchDist > 0) {
+    const p1 = e.touches[0];
+    const p2 = e.touches[1];
+    const currentDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
+    const factor = currentDist / initialPinchDist;
+    userScale = Math.min(3.5, Math.max(0.3, initialPinchScale * factor));
+    updateScaleDisplay();
+    applyArTransform();
+  }
+}, { passive: true });
+
+window.addEventListener('touchend', (e) => {
+  if (e.touches.length < 2) {
+    initialPinchDist = 0;
+  }
+});
+
+// Rotellina mouse per desktop
+arContent.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY < 0 ? 0.12 : -0.12;
+  userScale = Math.min(3.5, Math.max(0.3, userScale + delta));
+  updateScaleDisplay();
+  applyArTransform();
+}, { passive: false });
+
+// Controlli Zoom a schermo
+if (btnZoomIn) {
+  btnZoomIn.addEventListener('click', () => {
+    userScale = Math.min(3.5, userScale + 0.15);
+    updateScaleDisplay();
+    applyArTransform();
+  });
+}
+
+if (btnZoomOut) {
+  btnZoomOut.addEventListener('click', () => {
+    userScale = Math.max(0.3, userScale - 0.15);
+    updateScaleDisplay();
+    applyArTransform();
+  });
+}
+
+if (btnResetTransform) {
+  btnResetTransform.addEventListener('click', () => {
+    userOffsetX = 0;
+    userOffsetY = 0;
+    userScale = 1.0;
+    updateScaleDisplay();
+    applyArTransform();
+  });
+}
+
 window.addEventListener('pagehide', stopCamera);
 
 // Flag button event listeners

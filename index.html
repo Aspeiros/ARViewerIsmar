@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=7" />
+    <link rel="stylesheet" href="./src/styles.css?v=8" />
   </head>
   <body>
     <main class="experience" aria-live="polite">
@@ -78,6 +78,13 @@
           </div>
         </article>
 
+        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale and position controls">
+          <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
+          <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
+          <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
+          <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position and size" title="Reset">↺</button>
+        </div>
+
         <nav class="camera-controls" aria-label="Camera controls">
           <button class="frame-toggle is-active" id="frame-toggle" type="button" aria-pressed="true">
             <span class="frame-swatch" aria-hidden="true"></span>
@@ -100,6 +107,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=7"></script>
+    <script type="module" src="./src/app.js?v=8"></script>
   </body>
 </html>
