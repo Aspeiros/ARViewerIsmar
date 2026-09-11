@@ -1,5 +1,49 @@
 window.ISMAR_MEDIA_CATALOG = [
   {
+    "file": "media/animations/Taste_Puglia.gif",
+    "fileName": "Taste_Puglia.gif",
+    "name": "Taste Puglia",
+    "category": "animations",
+    "ext": ".gif",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/animations/Taste_Puglia.gif",
+    "png": "media/qrcodes/qr_animations_Taste_Puglia.png",
+    "svg": "media/qrcodes/qr_animations_Taste_Puglia.svg",
+    "sizeBytes": 1033730
+  },
+  {
+    "file": "media/animations/Welcome_to_Bari.gif",
+    "fileName": "Welcome_to_Bari.gif",
+    "name": "Welcome to Bari",
+    "category": "animations",
+    "ext": ".gif",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/animations/Welcome_to_Bari.gif",
+    "png": "media/qrcodes/qr_animations_Welcome_to_Bari.png",
+    "svg": "media/qrcodes/qr_animations_Welcome_to_Bari.svg",
+    "sizeBytes": 908450
+  },
+  {
+    "file": "media/animations/Welcome_to_ISMAR_2026.gif",
+    "fileName": "Welcome_to_ISMAR_2026.gif",
+    "name": "Welcome to ISMAR 2026",
+    "category": "animations",
+    "ext": ".gif",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/animations/Welcome_to_ISMAR_2026.gif",
+    "png": "media/qrcodes/qr_animations_Welcome_to_ISMAR_2026.png",
+    "svg": "media/qrcodes/qr_animations_Welcome_to_ISMAR_2026.svg",
+    "sizeBytes": 499635
+  },
+  {
+    "file": "media/animations/Welcome_to_Nicholaus_Hotel.gif",
+    "fileName": "Welcome_to_Nicholaus_Hotel.gif",
+    "name": "Welcome to Nicholaus Hotel",
+    "category": "animations",
+    "ext": ".gif",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/animations/Welcome_to_Nicholaus_Hotel.gif",
+    "png": "media/qrcodes/qr_animations_Welcome_to_Nicholaus_Hotel.png",
+    "svg": "media/qrcodes/qr_animations_Welcome_to_Nicholaus_Hotel.svg",
+    "sizeBytes": 435636
+  },
+  {
     "file": "media/images/Logo_Animated.gif",
     "fileName": "Logo_Animated.gif",
     "name": "Logo Animated",

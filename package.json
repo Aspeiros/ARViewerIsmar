@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "scripts": {
     "serve": "node server.mjs",
-    "qr": "node scripts/generate_qr.mjs"
+    "qr": "node scripts/generate_qr.mjs",
+    "animations": "python scripts/create_animations.py"
   },
   "dependencies": {
     "qrcode": "^1.5.4"
