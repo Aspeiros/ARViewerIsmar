@@ -1,0 +1,13 @@
+window.ISMAR_MEDIA_CATALOG = [
+  {
+    "file": "media/images/Logo_Animated.gif",
+    "fileName": "Logo_Animated.gif",
+    "name": "Logo Animated",
+    "category": "images",
+    "ext": ".gif",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/images/Logo_Animated.gif",
+    "png": "media/qrcodes/qr_images_Logo_Animated.png",
+    "svg": "media/qrcodes/qr_images_Logo_Animated.svg",
+    "sizeBytes": 1235544
+  }
+];

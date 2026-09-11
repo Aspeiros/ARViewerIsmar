@@ -1,4 +1,4 @@
-﻿import fs from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 import QRCode from 'qrcode';
 
@@ -121,6 +121,37 @@ async function main() {
   }
 
   console.log(`🎉 Tutti i QR code sono stati salvati nella cartella: media/qrcodes/\n`);
+
+  // Aggiorna il catalogo completo di tutti i file multimediali per la finestra interattiva
+  const allMedia = getFilesRecursively(MEDIA_DIR);
+  const catalog = [];
+  for (const f of allMedia) {
+    const relativeFromRoot = path.relative(process.cwd(), f).replace(/\\/g, '/');
+    const baseName = path.basename(f, path.extname(f));
+    const subFolder = path.basename(path.dirname(f));
+    const safeName = `qr_${subFolder}_${baseName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const pngRel = `media/qrcodes/${safeName}.png`;
+    const svgRel = `media/qrcodes/${safeName}.svg`;
+    catalog.push({
+      file: relativeFromRoot,
+      fileName: path.basename(f),
+      name: baseName.replace(/[-_]/g, ' '),
+      category: subFolder,
+      ext: path.extname(f).toLowerCase(),
+      url: `${BASE_URL}?media=${encodeURI(relativeFromRoot)}`,
+      png: pngRel,
+      svg: svgRel,
+      sizeBytes: fs.existsSync(f) ? fs.statSync(f).size : 0
+    });
+  }
+
+  const catalogJsonPath = path.join(MEDIA_DIR, 'catalog.json');
+  const catalogJsPath = path.join(MEDIA_DIR, 'catalog.js');
+  fs.writeFileSync(catalogJsonPath, JSON.stringify(catalog, null, 2));
+  fs.writeFileSync(catalogJsPath, `window.ISMAR_MEDIA_CATALOG = ${JSON.stringify(catalog, null, 2)};\n`);
+  console.log(`📋 Catalogo multimediale aggiornato con successo:`);
+  console.log(`   📄 JSON: media/catalog.json`);
+  console.log(`   📜 JS:   media/catalog.js\n`);
 }
 
 main().catch(console.error);

@@ -198,6 +198,45 @@ h1 { max-width: 510px; margin: 0; font-size: clamp(34px, 7.5vw, 64px); }
 .ar-spark-one { top: -18px; left: -11px; }.ar-spark-two { right: -14px; bottom: -18px; animation-delay: -.7s; }
 @keyframes float { 50% { transform: translateY(-6px) rotate(12deg); } }
 
+/* Modalità Solo Media Gigante (es. Logo ISMAR animato puro senza card) */
+.ar-content.is-media-only {
+  width: auto;
+  min-width: unset;
+  max-width: 90vw;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.ar-content.is-media-only .ar-orb,
+.ar-content.is-media-only .ar-spark,
+.ar-content.is-media-only .ar-text-group {
+  display: none !important;
+}
+.ar-content.is-media-only .ar-media-preview {
+  display: block;
+  width: min(84vw, 360px);
+  height: auto;
+  max-height: 54vh;
+  object-fit: contain;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.65));
+  animation: arFloat 3.2s ease-in-out infinite alternate;
+}
+@keyframes arFloat {
+  0% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(-8px) scale(1.02); }
+}
+
 .camera-controls { position: absolute; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: 1fr 74px 1fr; align-items: center; gap: 12px; padding: 16px 18px max(20px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, #000c 43%); }
 .frame-toggle, .secondary-control { justify-self: center; border: 1px solid #fff9; border-radius: 999px; color: white; background: #3d1209bb; font-size: 11px; font-weight: 600; min-height: 38px; padding: 7px 10px; }
 .frame-toggle { display: flex; align-items: center; gap: 6px; }.frame-toggle:not(.is-active) { opacity: .55; }

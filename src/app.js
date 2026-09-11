@@ -44,6 +44,9 @@ let mediaLoaded = false;
 if (mediaParam) {
   const ext = mediaParam.split('.').pop().toLowerCase();
   if (['gif', 'png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext)) {
+    if (arContent) {
+      arContent.classList.add('is-media-only');
+    }
     if (arOrb && arMediaPreview) {
       arOrb.hidden = true;
       arMediaPreview.hidden = false;
@@ -205,19 +208,43 @@ function positionContent(points) {
   const angle = Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x) * (180 / Math.PI);
   arContent.style.left = `${x}px`;
   arContent.style.top = `${y}px`;
-  arContent.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+  if (mediaParam) {
+    arContent.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+  } else {
+    arContent.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+  }
 }
 
 function showFallbackMarker() {
   marker = null;
   arContent.hidden = false;
   arContent.style.left = '50%';
-  arContent.style.top = '48%';
-  arContent.style.transform = 'translate(-50%, -100%)';
+  if (mediaParam) {
+    arContent.style.top = '48%';
+    arContent.style.transform = 'translate(-50%, -50%)';
+  } else {
+    arContent.style.top = '48%';
+    arContent.style.transform = 'translate(-50%, -100%)';
+  }
   markerGuide.classList.remove('is-hidden');
 }
 
 function drawArCard(context, width, height) {
+  if (mediaParam && mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
+    const scale = Math.min(width / 390, height / 844);
+    const mediaSize = Math.min(width * 0.78, height * 0.52);
+    const x = (width - mediaSize) / 2;
+    const y = (height - mediaSize) / 2 - height * 0.04;
+
+    context.save();
+    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    context.shadowBlur = 32 * scale;
+    context.shadowOffsetY = 16 * scale;
+    context.drawImage(mediaImage, x, y, mediaSize, mediaSize);
+    context.restore();
+    return;
+  }
+
   const currentContent = getCurrentContent();
   const x = width * 0.5;
   const y = height * 0.32;
@@ -240,33 +267,18 @@ function drawArCard(context, width, height) {
   roundRect(context, -cardWidth / 2, -cardHeight, cardWidth, cardHeight, 18 * scale);
   context.stroke();
 
-  if (mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
-    context.save();
-    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
-    context.clip();
-    context.fillStyle = '#ffffff';
-    context.fillRect(-cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale);
-    context.drawImage(mediaImage, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale);
-    context.restore();
+  context.fillStyle = '#ffe000';
+  roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
+  context.fill();
 
-    context.strokeStyle = '#3d1209';
-    context.lineWidth = 2 * scale;
-    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
-    context.stroke();
-  } else {
-    context.fillStyle = '#ffe000';
-    roundRect(context, -cardWidth / 2 + 15 * scale, -cardHeight + 22 * scale, 53 * scale, 53 * scale, 15 * scale);
-    context.fill();
+  context.strokeStyle = '#3d1209';
+  context.lineWidth = 2 * scale;
+  context.stroke();
 
-    context.strokeStyle = '#3d1209';
-    context.lineWidth = 2 * scale;
-    context.stroke();
-
-    context.fillStyle = '#3d1209';
-    context.font = `700 ${17 * scale}px Poppins`;
-    context.textAlign = 'center';
-    context.fillText('AR', -cardWidth / 2 + 41.5 * scale, -cardHeight + 57 * scale);
-  }
+  context.fillStyle = '#3d1209';
+  context.font = `700 ${17 * scale}px Poppins`;
+  context.textAlign = 'center';
+  context.fillText('AR', -cardWidth / 2 + 41.5 * scale, -cardHeight + 57 * scale);
 
   context.textAlign = 'left';
   context.fillStyle = '#008bf2';

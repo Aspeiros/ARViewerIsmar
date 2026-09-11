@@ -1,105 +1,681 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ISMAR 2026 · AR Marker & QR Generator</title>
+    <title>ISMAR 2026 · Catalogo Multimediale & Stampa QR Code</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tsukimi+Rounded:wght@600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@600;700&display=swap" rel="stylesheet" />
     <style>
-      :root { font-family: Poppins, Arial, sans-serif; color: #3d1209; background: #f4e8d4; }
-      * { box-sizing: border-box; } body { margin: 0; min-width: 320px; }
-      main { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 86% 12%, #fff0b3, transparent 28%), linear-gradient(145deg, #f7d3cb, #f4e8d4 60%, #fff0b3); }
-      .card { width: min(600px, 100%); padding: clamp(24px, 5vw, 44px); text-align: center; border: 2px solid #3d1209; border-radius: 25px; background: #fffdf8ee; box-shadow: 8px 8px 0 #3d1209; }
-      img.logo { width: min(280px, 80%); margin-bottom: 16px; }
-      h1 { margin: 0 0 10px; font: 700 clamp(26px, 5vw, 40px)/1.1 "Tsukimi Rounded", Poppins, sans-serif; }
-      p.subtitle { max-width: 460px; margin: 0 auto 20px; line-height: 1.5; font-size: 15px; }
-      .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
-      .control-group { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 12px; font-weight: 600; }
-      select { padding: 8px 14px; border: 2px solid #3d1209; border-radius: 10px; background: white; font-family: inherit; font-size: 14px; font-weight: 600; color: #3d1209; cursor: pointer; }
-      #qr { display: grid; place-items: center; width: min(300px, 76vw); aspect-ratio: 1; padding: 16px; margin: 10px auto 14px; border: 10px solid #ffe000; border-radius: 16px; background: white; box-shadow: 4px 4px 0 #3d1209; }
-      #qr img, #qr canvas { width: 100%; height: 100%; margin: 0; image-rendering: pixelated; }
-      .url { overflow-wrap: anywhere; color: #006df2; font-size: 13px; font-weight: 600; margin: 8px 0; }
-      .actions { display: flex; justify-content: center; gap: 10px; margin-top: 14px; }
-      .btn { padding: 9px 18px; border: 2px solid #3d1209; border-radius: 10px; font-weight: 700; font-size: 13px; cursor: pointer; background: #ffe000; box-shadow: 3px 3px 0 #3d1209; }
-      .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #3d1209; }
-      .tip { margin-top: 18px; margin-bottom: 0; font-size: 12px; font-weight: 500; opacity: 0.8; }
+      :root {
+        --brown: #3d1209;
+        --yellow: #ffe000;
+        --blue: #008bf2;
+        --cream: #f4e8d4;
+        --card-bg: #fffdf9;
+        font-family: Poppins, Arial, sans-serif;
+        color: var(--brown);
+        background: var(--cream);
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; }
+
+      main {
+        min-height: 100vh;
+        padding: clamp(20px, 4vw, 40px) 16px;
+        background: radial-gradient(circle at 86% 12%, #fff0b3, transparent 28%), linear-gradient(145deg, #f7d3cb, #f4e8d4 60%, #fff0b3);
+      }
+
+      .container {
+        max-width: 1060px;
+        margin: 0 auto;
+      }
+
+      .header-card {
+        padding: clamp(24px, 4vw, 36px);
+        text-align: center;
+        border: 2px solid var(--brown);
+        border-radius: 24px;
+        background: var(--card-bg);
+        box-shadow: 6px 6px 0 var(--brown);
+        margin-bottom: 24px;
+      }
+      img.logo { width: min(260px, 70%); margin-bottom: 12px; }
+      h1 { margin: 0 0 8px; font: 700 clamp(24px, 4vw, 36px)/1.1 "Tsukimi Rounded", Poppins, sans-serif; }
+      p.subtitle { max-width: 580px; margin: 0 auto 16px; line-height: 1.5; font-size: 14px; opacity: 0.9; }
+
+      .nav-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .tab-btn {
+        padding: 10px 20px;
+        border: 2px solid var(--brown);
+        border-radius: 999px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        background: white;
+        color: var(--brown);
+        box-shadow: 3px 3px 0 var(--brown);
+        transition: transform 0.1s ease;
+      }
+      .tab-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--brown); }
+      .tab-btn.is-active {
+        background: var(--yellow);
+        box-shadow: 3px 3px 0 var(--brown);
+      }
+
+      /* CATALOG VIEW */
+      .catalog-stats {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .catalog-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .media-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 2px solid var(--brown);
+        border-radius: 20px;
+        background: var(--card-bg);
+        box-shadow: 5px 5px 0 var(--brown);
+        padding: 18px;
+        transition: transform 0.15s ease;
+      }
+      .media-card:hover { transform: translateY(-3px); }
+
+      .card-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+      .badge-category {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 999px;
+        border: 1.5px solid var(--brown);
+        background: var(--yellow);
+      }
+      .file-size { font-size: 11px; opacity: 0.7; }
+
+      .card-visual-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .visual-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+      .visual-label { font-size: 11px; font-weight: 600; opacity: 0.8; }
+      .media-thumb-wrap {
+        width: 120px;
+        height: 120px;
+        border: 2px solid var(--brown);
+        border-radius: 14px;
+        background: white;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        padding: 6px;
+        box-shadow: 2px 2px 0 var(--brown);
+      }
+      .media-thumb-wrap img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+      .qr-thumb-wrap {
+        width: 120px;
+        height: 120px;
+        border: 2px solid var(--brown);
+        border-radius: 14px;
+        background: white;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        padding: 6px;
+        box-shadow: 2px 2px 0 var(--brown);
+      }
+      .qr-thumb-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      .card-info {
+        margin-bottom: 16px;
+      }
+      .file-title {
+        margin: 0 0 4px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--brown);
+      }
+      .file-path {
+        font-family: monospace;
+        font-size: 11px;
+        color: #555;
+        overflow-wrap: anywhere;
+        margin: 0 0 6px;
+      }
+      .ar-note {
+        font-size: 11px;
+        color: #0070c9;
+        font-weight: 600;
+      }
+
+      .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .action-btn {
+        padding: 8px 10px;
+        border: 1.5px solid var(--brown);
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        color: var(--brown);
+        background: #f4e8d4;
+        box-shadow: 2px 2px 0 var(--brown);
+        transition: transform 0.1s ease;
+      }
+      .action-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--brown); }
+      .action-btn.btn-print {
+        grid-column: span 2;
+        background: var(--yellow);
+        font-size: 13px;
+        padding: 9px;
+      }
+      .action-btn.btn-webar {
+        grid-column: span 2;
+        background: #ffffff;
+        color: #006df2;
+      }
+
+      /* CUSTOM GENERATOR VIEW */
+      .custom-generator {
+        max-width: 620px;
+        margin: 0 auto;
+        padding: clamp(20px, 4vw, 36px);
+        border: 2px solid var(--brown);
+        border-radius: 24px;
+        background: var(--card-bg);
+        box-shadow: 6px 6px 0 var(--brown);
+        text-align: center;
+      }
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        text-align: left;
+        margin: 20px 0;
+      }
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      input[type="text"], select {
+        padding: 10px 14px;
+        border: 2px solid var(--brown);
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        background: white;
+      }
+      #custom-qr-box {
+        display: grid;
+        place-items: center;
+        width: min(280px, 75vw);
+        aspect-ratio: 1;
+        padding: 14px;
+        margin: 16px auto;
+        border: 8px solid var(--yellow);
+        border-radius: 16px;
+        background: white;
+        box-shadow: 4px 4px 0 var(--brown);
+      }
+      #custom-qr-box img, #custom-qr-box canvas {
+        width: 100%;
+        height: 100%;
+        image-rendering: pixelated;
+      }
+      .custom-url {
+        font-size: 12px;
+        font-weight: 600;
+        color: #006df2;
+        overflow-wrap: anywhere;
+        margin: 8px 0 16px;
+      }
+
+      /* PRINT SHEET (NASCIA A VIDEO, VISIBILE SOLO IN STAMPA) */
+      #print-sheet {
+        display: none;
+      }
+
+      @media print {
+        @page {
+          size: A4 portrait;
+          margin: 15mm;
+        }
+        body {
+          background: white !important;
+          color: #3d1209 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        main {
+          display: none !important;
+        }
+        #print-sheet {
+          display: flex !important;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 94vh;
+          text-align: center;
+          padding: 20px;
+          page-break-after: always;
+        }
+        .print-logo {
+          width: 240px;
+          margin-bottom: 24px;
+        }
+        .print-category {
+          font-size: 13px;
+          font-weight: 700;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: #008bf2;
+          margin-bottom: 6px;
+        }
+        .print-title {
+          font-size: 32px;
+          font-weight: 700;
+          color: #3d1209;
+          margin: 0 0 16px;
+          font-family: "Tsukimi Rounded", Poppins, sans-serif;
+        }
+        .print-qr-frame {
+          padding: 24px;
+          border: 14px solid #ffe000;
+          border-radius: 28px;
+          background: white;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+          margin-bottom: 24px;
+        }
+        .print-qr-frame img {
+          width: 360px;
+          height: 360px;
+          display: block;
+          image-rendering: pixelated;
+        }
+        .print-instructions {
+          max-width: 500px;
+          border: 2px solid #ffe000;
+          background: #fffdf5;
+          border-radius: 18px;
+          padding: 16px 20px;
+          margin-bottom: 24px;
+        }
+        .print-step {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          text-align: left;
+          margin-bottom: 8px;
+          font-size: 13px;
+        }
+        .print-step:last-child { margin-bottom: 0; }
+        .print-num {
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: #ffe000;
+          border: 1.5px solid #3d1209;
+          display: grid;
+          place-items: center;
+          font-weight: 700;
+          font-size: 12px;
+          flex-shrink: 0;
+        }
+        .print-footer {
+          font-size: 12px;
+          font-weight: 600;
+          color: #666;
+          border-top: 1px solid #ddd;
+          padding-top: 12px;
+          width: 100%;
+          max-width: 500px;
+        }
+      }
     </style>
   </head>
   <body>
     <main>
-      <section class="card">
-        <img class="logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
-        <h1>AR Marker & QR Generator</h1>
-        <p class="subtitle">Select the destination station and language, test on screen or export the QR code.</p>
+      <div class="container">
+        <header class="header-card">
+          <img class="logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+          <h1>Catalogo Multimediale & Stampa QR</h1>
+          <p class="subtitle">
+            Visualizza tutti i contenuti multimediali caricati nel progetto, genera i QR code dedicati e <strong>stampali singolarmente</strong> per l'esposizione.
+          </p>
 
-        <div class="controls">
-          <div class="control-group">
-            <label for="mode-select">QR Target:</label>
-            <select id="mode-select">
-              <option value="media" selected>Media File (GIF / Image / 3D)</option>
-              <option value="station">Preset Station (Content)</option>
-            </select>
+          <div class="nav-tabs">
+            <button class="tab-btn is-active" id="tab-btn-catalog" type="button">📁 Elenco File Multimediali</button>
+            <button class="tab-btn" id="tab-btn-custom" type="button">⚙️ Generatore Singolo / Stazioni</button>
           </div>
-          <div class="control-group" id="group-media">
-            <label for="media-input">Media File Path:</label>
-            <input type="text" id="media-input" value="media/images/Logo_Animated.gif" style="padding: 8px 12px; border: 2px solid #3d1209; border-radius: 10px; font-family: inherit; font-size: 13px; font-weight: 600; width: 250px;" />
-          </div>
-          <div class="control-group" id="group-station" style="display: none;">
-            <label for="content-select">Venue Station:</label>
-            <select id="content-select">
-              <option value="welcome" selected>Welcome to Bari (General)</option>
-              <option value="food">Taste Puglia (Gastronomy)</option>
-              <option value="venue">Explore Venue (Conference Hall)</option>
-            </select>
-          </div>
-          <div class="control-group">
-            <label for="lang-select">Language:</label>
-            <select id="lang-select">
-              <option value="en" selected>English 🇬🇧 (Default)</option>
-              <option value="it">Italiano 🇮🇹</option>
-              <option value="de">Deutsch 🇩🇪</option>
-              <option value="es">Español 🇪🇸</option>
-              <option value="fr">Français 🇫🇷</option>
-              <option value="zh">中文 🇨🇳</option>
-              <option value="ja">日本語 🇯🇵</option>
-              <option value="ko">한국어 🇰🇷</option>
-            </select>
-          </div>
-        </div>
+        </header>
 
-        <div id="qr" aria-label="QR Code"></div>
-        <p class="url" id="url"></p>
+        <!-- SEZIONE 1: ELENCO E STAMPA SINGOLA DEI FILE -->
+        <section id="section-catalog">
+          <div class="catalog-stats">
+            <span id="catalog-count-text">Caricamento file multimediali...</span>
+            <button class="action-btn" id="reload-catalog-btn" type="button" style="padding: 6px 14px;">🔄 Aggiorna Elenco</button>
+          </div>
 
-        <div class="actions">
-          <button class="btn" id="download-btn" type="button">Download High-Res QR</button>
-        </div>
+          <div class="catalog-grid" id="catalog-grid"></div>
+        </section>
 
-        <p class="tip">Tip: Scan with your smartphone, tap "Open camera", and aim back at this QR code.</p>
-      </section>
+        <!-- SEZIONE 2: GENERATORE PERSONALIZZATO / STAZIONI -->
+        <section id="section-custom" style="display: none;">
+          <div class="custom-generator">
+            <h2 style="margin: 0 0 10px; font-size: 22px;">Generatore Manuale QR Code</h2>
+            <p style="margin: 0; font-size: 13px; opacity: 0.85;">Seleziona una stazione o inserisci un percorso file per testarlo al volo.</p>
+
+            <div class="controls">
+              <div class="control-group">
+                <label for="mode-select">Tipo di destinazione:</label>
+                <select id="mode-select">
+                  <option value="media" selected>File Multimediale (GIF / Immagine / 3D)</option>
+                  <option value="station">Stazione Preimpostata (Benvenuto / Food / Venue)</option>
+                </select>
+              </div>
+
+              <div class="control-group" id="group-media">
+                <label for="media-input">Percorso File:</label>
+                <input type="text" id="media-input" value="media/images/Logo_Animated.gif" />
+              </div>
+
+              <div class="control-group" id="group-station" style="display: none;">
+                <label for="content-select">Stazione Venue:</label>
+                <select id="content-select">
+                  <option value="welcome" selected>Welcome to Bari (Generale)</option>
+                  <option value="food">Taste Puglia (Gastronomia)</option>
+                  <option value="venue">Explore Venue (Centro Congressi)</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <label for="lang-select">Lingua preimpostata:</label>
+                <select id="lang-select">
+                  <option value="en" selected>English 🇬🇧 (Default)</option>
+                  <option value="it">Italiano 🇮🇹</option>
+                  <option value="de">Deutsch 🇩🇪</option>
+                  <option value="es">Español 🇪🇸</option>
+                  <option value="fr">Français 🇫🇷</option>
+                  <option value="zh">中文 🇨🇳</option>
+                  <option value="ja">日本語 🇯🇵</option>
+                  <option value="ko">한국어 🇰🇷</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="custom-qr-box" aria-label="QR Code"></div>
+            <p class="custom-url" id="custom-url"></p>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+              <button class="action-btn btn-print" id="custom-print-btn" type="button" style="padding: 10px 20px;">🖨️ Stampa questo QR</button>
+              <button class="action-btn" id="custom-download-btn" type="button" style="padding: 10px 20px;">💾 Scarica PNG</button>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
+
+    <!-- FOGLIO A4 PER LA STAMPA SINGOLA -->
+    <div id="print-sheet">
+      <img class="print-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+      <div class="print-category" id="print-category">Realtà Aumentata · ISMAR 2026</div>
+      <h2 class="print-title" id="print-title">Logo Animated</h2>
+      <div class="print-qr-frame">
+        <img id="print-qr-img" src="" alt="QR Code" />
+      </div>
+      <div class="print-instructions">
+        <div class="print-step">
+          <span class="print-num">1</span>
+          <span>Inquadra il codice QR con la fotocamera dello smartphone</span>
+        </div>
+        <div class="print-step">
+          <span class="print-num">2</span>
+          <span>Tocca <strong>"Apri la fotocamera"</strong> e ripuntala verso il QR code per vedere l'animazione in AR!</span>
+        </div>
+      </div>
+      <div class="print-footer">
+        IEEE ISMAR 2026 · Bari, Italy · Scansiona per attivare l'esperienza WebAR
+      </div>
+    </div>
+
+    <!-- Script QR Code e Catalogo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="./media/catalog.js"></script>
     <script>
-      const qrContainer = document.querySelector('#qr');
-      const urlText = document.querySelector('#url');
+      // Dati di fallback nel caso in cui il file JS non sia ancora generato
+      const FALLBACK_CATALOG = [
+        {
+          file: 'media/images/Logo_Animated.gif',
+          fileName: 'Logo_Animated.gif',
+          name: 'Logo Animated',
+          category: 'images',
+          ext: '.gif',
+          url: `${window.location.origin}${window.location.pathname.replace(/\/test\.html.*$/, '/') }?media=media/images/Logo_Animated.gif`,
+          png: 'media/qrcodes/qr_images_Logo_Animated.png',
+          svg: 'media/qrcodes/qr_images_Logo_Animated.svg',
+          sizeBytes: 1235544
+        }
+      ];
+
+      const tabCatalog = document.querySelector('#tab-btn-catalog');
+      const tabCustom = document.querySelector('#tab-btn-custom');
+      const sectionCatalog = document.querySelector('#section-catalog');
+      const sectionCustom = document.querySelector('#section-custom');
+      const catalogGrid = document.querySelector('#catalog-grid');
+      const catalogCountText = document.querySelector('#catalog-count-text');
+      const reloadCatalogBtn = document.querySelector('#reload-catalog-btn');
+
+      // Stampa foglio singolo
+      const printSheet = document.querySelector('#print-sheet');
+      const printCategory = document.querySelector('#print-category');
+      const printTitle = document.querySelector('#print-title');
+      const printQrImg = document.querySelector('#print-qr-img');
+
+      // Custom generator elements
       const modeSelect = document.querySelector('#mode-select');
       const groupMedia = document.querySelector('#group-media');
       const groupStation = document.querySelector('#group-station');
       const mediaInput = document.querySelector('#media-input');
       const contentSelect = document.querySelector('#content-select');
       const langSelect = document.querySelector('#lang-select');
-      const downloadBtn = document.querySelector('#download-btn');
-      let qrInstance = null;
+      const customQrBox = document.querySelector('#custom-qr-box');
+      const customUrl = document.querySelector('#custom-url');
+      const customPrintBtn = document.querySelector('#custom-print-btn');
+      const customDownloadBtn = document.querySelector('#custom-download-btn');
+      let customQrInstance = null;
 
-      function updateMode() {
+      // Navigazione Tab
+      tabCatalog.addEventListener('click', () => {
+        tabCatalog.classList.add('is-active');
+        tabCustom.classList.remove('is-active');
+        sectionCatalog.style.display = 'block';
+        sectionCustom.style.display = 'none';
+      });
+
+      tabCustom.addEventListener('click', () => {
+        tabCustom.classList.add('is-active');
+        tabCatalog.classList.remove('is-active');
+        sectionCatalog.style.display = 'none';
+        sectionCustom.style.display = 'block';
+        updateCustomQR();
+      });
+
+      function formatBytes(bytes) {
+        if (!bytes) return '';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+      }
+
+      function getCatalogItems() {
+        if (window.ISMAR_MEDIA_CATALOG && window.ISMAR_MEDIA_CATALOG.length) {
+          return window.ISMAR_MEDIA_CATALOG;
+        }
+        return FALLBACK_CATALOG;
+      }
+
+      function renderCatalog() {
+        const items = getCatalogItems();
+        catalogCountText.textContent = `Trovati ${items.length} file multimediali in media/`;
+        catalogGrid.innerHTML = '';
+
+        items.forEach((item) => {
+          const card = document.createElement('article');
+          card.className = 'media-card';
+
+          const basePath = window.location.pathname.replace(/\/test\.html.*$/, '/');
+          const targetUrl = `${window.location.origin}${basePath}?media=${encodeURI(item.file)}`;
+
+          const isGif = item.ext === '.gif';
+          const isImg = ['.png', '.jpg', '.jpeg', '.webp', '.svg'].includes(item.ext);
+          const isSpecialGiant = item.fileName.includes('Logo_Animated') || isGif;
+
+          card.innerHTML = `
+            <div>
+              <div class="card-header-row">
+                <span class="badge-category">${item.category} (${item.ext.toUpperCase()})</span>
+                <span class="file-size">${formatBytes(item.sizeBytes)}</span>
+              </div>
+
+              <div class="card-visual-row">
+                <div class="visual-box">
+                  <span class="visual-label">Anteprima Media</span>
+                  <div class="media-thumb-wrap">
+                    ${isImg || isGif 
+                      ? `<img src="${item.file}" alt="${item.name}" loading="lazy" />` 
+                      : `<span style="font-size: 32px;">📦</span>`}
+                  </div>
+                </div>
+                <div class="visual-box">
+                  <span class="visual-label">QR Code WebAR</span>
+                  <div class="qr-thumb-wrap">
+                    <img src="${item.png || item.svg}" alt="QR Code ${item.name}" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h3 class="file-title">${item.name}</h3>
+                <p class="file-path">${item.file}</p>
+                <div class="ar-note">
+                  ${isSpecialGiant ? '✨ Modalità Gigante AR (solo GIF animata)' : '✨ Visualizzazione AR attiva'}
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="action-btn btn-print" type="button" data-action="print" data-title="${item.name}" data-category="${item.category}" data-qr="${item.png || item.svg}">
+                🖨️ Stampa QR Singolo
+              </button>
+              <a class="action-btn" href="${item.png}" download="ISMAR2026-QR-${item.fileName.replace(/\.[^/.]+$/, '')}.png">
+                💾 PNG (1024px)
+              </a>
+              <a class="action-btn" href="${item.svg}" download="ISMAR2026-QR-${item.fileName.replace(/\.[^/.]+$/, '')}.svg">
+                📐 SVG Vettoriale
+              </a>
+              <a class="action-btn btn-webar" href="${targetUrl}" target="_blank" rel="noopener">
+                🚀 Prova in WebAR
+              </a>
+            </div>
+          `;
+
+          catalogGrid.appendChild(card);
+        });
+
+        // Event listener per la stampa del singolo QR code
+        catalogGrid.querySelectorAll('[data-action="print"]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const title = btn.getAttribute('data-title');
+            const category = btn.getAttribute('data-category');
+            const qrSrc = btn.getAttribute('data-qr');
+            triggerPrintSingle(title, category, qrSrc);
+          });
+        });
+      }
+
+      function triggerPrintSingle(title, category, qrSrc) {
+        printTitle.textContent = title;
+        printCategory.textContent = `Esperienza AR · ${category.toUpperCase()} · ISMAR 2026`;
+        printQrImg.src = qrSrc;
+        // Apri la finestra di stampa di sistema
+        setTimeout(() => {
+          window.print();
+        }, 150);
+      }
+
+      // Ricarica catalogo
+      reloadCatalogBtn.addEventListener('click', () => {
+        fetch('./media/catalog.json?t=' + Date.now())
+          .then((res) => res.json())
+          .then((data) => {
+            window.ISMAR_MEDIA_CATALOG = data;
+            renderCatalog();
+          })
+          .catch(() => {
+            renderCatalog();
+          });
+      });
+
+      // Logica generatore personalizzato
+      function updateCustomMode() {
         const isMedia = modeSelect.value === 'media';
         groupMedia.style.display = isMedia ? 'flex' : 'none';
         groupStation.style.display = isMedia ? 'none' : 'flex';
-        updateQR();
+        updateCustomQR();
       }
 
-      function updateQR() {
+      function updateCustomQR() {
         const basePath = window.location.pathname.replace(/\/test\.html.*$/, '/');
         const lang = langSelect.value;
         let destination = '';
@@ -112,9 +688,9 @@
           destination = `${window.location.origin}${basePath}?content=${content}&lang=${lang}`;
         }
 
-        urlText.textContent = destination;
-        qrContainer.innerHTML = '';
-        qrInstance = new QRCode(qrContainer, {
+        customUrl.textContent = destination;
+        customQrBox.innerHTML = '';
+        customQrInstance = new QRCode(customQrBox, {
           text: destination,
           width: 512,
           height: 512,
@@ -124,14 +700,22 @@
         });
       }
 
-      modeSelect.addEventListener('change', updateMode);
-      mediaInput.addEventListener('input', updateQR);
-      contentSelect.addEventListener('change', updateQR);
-      langSelect.addEventListener('change', updateQR);
+      modeSelect.addEventListener('change', updateCustomMode);
+      mediaInput.addEventListener('input', updateCustomQR);
+      contentSelect.addEventListener('change', updateCustomQR);
+      langSelect.addEventListener('change', updateCustomQR);
 
-      downloadBtn.addEventListener('click', () => {
-        const img = qrContainer.querySelector('img');
-        const canvas = qrContainer.querySelector('canvas');
+      customPrintBtn.addEventListener('click', () => {
+        const canvas = customQrBox.querySelector('canvas');
+        const img = customQrBox.querySelector('img');
+        const src = img?.src || canvas?.toDataURL('image/png');
+        const label = modeSelect.value === 'media' ? mediaInput.value.split('/').pop().replace(/\.[^/.]+$/, '') : contentSelect.value;
+        triggerPrintSingle(label, 'Custom WebAR', src);
+      });
+
+      customDownloadBtn.addEventListener('click', () => {
+        const img = customQrBox.querySelector('img');
+        const canvas = customQrBox.querySelector('canvas');
         const source = img?.src || canvas?.toDataURL('image/png');
         if (!source) return;
         const a = document.createElement('a');
@@ -141,7 +725,8 @@
         a.click();
       });
 
-      updateMode();
+      // Inizializza
+      renderCatalog();
     </script>
   </body>
 </html>
