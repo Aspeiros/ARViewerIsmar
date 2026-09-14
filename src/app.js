@@ -43,6 +43,17 @@ const btnRotLeft = document.querySelector('#btn-rot-left');
 const btnRotRight = document.querySelector('#btn-rot-right');
 const btnToggle3d = document.querySelector('#btn-toggle-3d');
 const btnTogglePause = document.querySelector('#btn-toggle-pause');
+const arTransformBar = document.querySelector('#ar-transform-bar');
+const liveFrameOverlay = document.querySelector('#live-frame-overlay');
+const liveFrameWatermark = document.querySelector('#live-frame-watermark');
+
+function updateLiveFrame() {
+  if (liveFrameOverlay) {
+    liveFrameOverlay.classList.toggle('is-hidden', !isFramed);
+  }
+  document.body.classList.toggle('frame-active', isFramed);
+}
+
 const btnResetTransform = document.querySelector('#btn-reset-transform');
 const arScaleBadge = document.querySelector('#ar-scale-badge');
 
@@ -268,6 +279,10 @@ function updateTranslations() {
     btn.setAttribute('aria-pressed', String(isActive));
   });
 
+  if (liveFrameWatermark) {
+    liveFrameWatermark.textContent = t.watermark || 'XR venue experience · #ISMAR2026';
+  }
+
   if (marker) {
     trackingText.textContent = t.trackingHintFound;
   } else {
@@ -292,6 +307,8 @@ async function startCamera() {
     document.body.classList.add('camera-active');
     startScreen.hidden = true;
     cameraUi.hidden = false;
+    if (arTransformBar) arTransformBar.hidden = false;
+    updateLiveFrame();
     setMessage(t.contentHint);
     initialiseDetector();
   } catch (error) {
@@ -726,6 +743,7 @@ frameToggle.addEventListener('click', () => {
   isFramed = !isFramed;
   frameToggle.classList.toggle('is-active', isFramed);
   frameToggle.setAttribute('aria-pressed', String(isFramed));
+  updateLiveFrame();
 });
 captureButton.addEventListener('click', () => {
   if (captureMode === 'gif') {
@@ -1050,5 +1068,6 @@ langBtns.forEach((btn) => {
   });
 });
 
-// Initialize translations on load
+// Initialize translations and live frame on load
 updateTranslations();
+updateLiveFrame();

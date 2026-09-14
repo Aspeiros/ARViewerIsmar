@@ -271,14 +271,76 @@ h1 { max-width: 510px; margin: 0; font-size: clamp(34px, 7.5vw, 64px); }
   100% { transform: translateY(-8px) scale(1.02); }
 }
 
-#ar-content[hidden] ~ .ar-transform-bar,
-.ar-transform-bar[hidden] {
-  display: none !important;
-}
-
 .ar-content.is-paused *,
 .ar-content.is-paused {
   animation-play-state: paused !important;
+}
+
+/* Live ISMAR Frame Preview */
+.live-frame-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.live-frame-overlay.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.live-frame-border {
+  position: absolute;
+  inset: 0;
+  border: 11px solid var(--yellow);
+  box-sizing: border-box;
+}
+
+.live-frame-border::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 4.5px solid var(--blue);
+  box-sizing: border-box;
+}
+
+.live-frame-bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(max(18px, env(safe-area-inset-bottom)) + 114px);
+  background: rgba(61, 18, 9, 0.88);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 8px 18px;
+  box-sizing: border-box;
+}
+
+.live-frame-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.live-frame-logo {
+  height: 22px;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+}
+
+.live-frame-watermark {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.2px;
 }
 
 .ar-transform-bar {
@@ -380,6 +442,11 @@ h1 { max-width: 510px; margin: 0; font-size: clamp(34px, 7.5vw, 64px); }
   gap: 12px;
   padding: 12px 18px max(20px, env(safe-area-inset-bottom));
   background: linear-gradient(transparent, #000c 43%);
+  transition: background 0.2s ease;
+  z-index: 5;
+}
+body.frame-active .camera-controls {
+  background: transparent;
 }
 .frame-toggle, .secondary-control {
   justify-self: center;

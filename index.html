@@ -80,7 +80,18 @@
           </div>
         </article>
 
-        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls" hidden>
+        <!-- Live ISMAR Frame Preview -->
+        <div class="live-frame-overlay" id="live-frame-overlay" aria-hidden="true">
+          <div class="live-frame-border"></div>
+          <div class="live-frame-bottom-bar">
+            <div class="live-frame-info">
+              <img class="live-frame-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+              <span class="live-frame-watermark" id="live-frame-watermark" data-i18n="watermark">XR venue experience · #ISMAR2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls">
           <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
           <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
           <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
@@ -126,6 +137,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=11"></script>
+    <script type="module" src="./src/app.js?v=12"></script>
   </body>
 </html>
