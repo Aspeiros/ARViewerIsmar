@@ -1,5 +1,16 @@
 window.ISMAR_MEDIA_CATALOG = [
   {
+    "file": "media/3d_models/ISMAR_3D_Logo.glb",
+    "fileName": "ISMAR_3D_Logo.glb",
+    "name": "ISMAR 3D Logo",
+    "category": "3d_models",
+    "ext": ".glb",
+    "url": "https://aspeiros.github.io/ARViewerIsmar/?media=media/3d_models/ISMAR_3D_Logo.glb",
+    "png": "media/qrcodes/qr_3d_models_ISMAR_3D_Logo.png",
+    "svg": "media/qrcodes/qr_3d_models_ISMAR_3D_Logo.svg",
+    "sizeBytes": 41040
+  },
+  {
     "file": "media/animations/Taste_Puglia.gif",
     "fileName": "Taste_Puglia.gif",
     "name": "Taste Puglia",

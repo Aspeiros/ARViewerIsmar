@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@600;700&display=swap" rel="stylesheet" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <style>
       :root {
         --brown: #3d1209;
@@ -579,6 +580,7 @@
 
           const isGif = item.ext === '.gif';
           const isImg = ['.png', '.jpg', '.jpeg', '.webp', '.svg'].includes(item.ext);
+          const is3D = ['.glb', '.gltf'].includes(item.ext);
           const isSpecialGiant = item.fileName.includes('Logo_Animated') || isGif;
 
           card.innerHTML = `
@@ -592,9 +594,11 @@
                 <div class="visual-box">
                   <span class="visual-label">Anteprima Media</span>
                   <div class="media-thumb-wrap">
-                    ${isImg || isGif 
-                      ? `<img src="${item.file}" alt="${item.name}" loading="lazy" />` 
-                      : `<span style="font-size: 32px;">📦</span>`}
+                    ${is3D 
+                      ? `<model-viewer src="${item.file}" style="width:100%;height:100%;background:transparent;" auto-rotate camera-controls interaction-prompt="none" shadow-intensity="1"></model-viewer>`
+                      : (isImg || isGif 
+                        ? `<img src="${item.file}" alt="${item.name}" loading="lazy" />` 
+                        : `<span style="font-size: 32px;">📦</span>`)}
                   </div>
                 </div>
                 <div class="visual-box">
@@ -609,7 +613,9 @@
                 <h3 class="file-title">${item.name}</h3>
                 <p class="file-path">${item.file}</p>
                 <div class="ar-note">
-                  ${isSpecialGiant ? '✨ Modalità Gigante AR (solo GIF animata)' : '✨ Visualizzazione AR attiva'}
+                  ${is3D 
+                    ? '🧊 Modello 3D Interattivo (rotazione 360° & tilt)' 
+                    : (isSpecialGiant ? '✨ Modalità Gigante AR (solo animazione)' : '✨ Visualizzazione AR attiva')}
                 </div>
               </div>
             </div>

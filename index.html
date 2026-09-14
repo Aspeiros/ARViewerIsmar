@@ -9,25 +9,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=8" />
+    <link rel="stylesheet" href="./src/styles.css?v=9" />
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   </head>
   <body>
     <main class="experience" aria-live="polite">
       <video id="camera" autoplay playsinline muted aria-label="Camera preview"></video>
       <canvas id="capture-canvas" hidden></canvas>
 
-      <nav class="lang-bar" id="lang-bar" aria-label="Select language">
-        <button class="lang-btn is-active" data-lang="en" type="button" title="English" aria-label="English">🇬🇧</button>
-        <button class="lang-btn" data-lang="it" type="button" title="Italiano" aria-label="Italiano">🇮🇹</button>
-        <button class="lang-btn" data-lang="de" type="button" title="Deutsch" aria-label="Deutsch">🇩🇪</button>
-        <button class="lang-btn" data-lang="es" type="button" title="Español" aria-label="Español">🇪🇸</button>
-        <button class="lang-btn" data-lang="fr" type="button" title="Français" aria-label="Français">🇫🇷</button>
-        <button class="lang-btn" data-lang="zh" type="button" title="中文" aria-label="中文">🇨🇳</button>
-        <button class="lang-btn" data-lang="ja" type="button" title="日本語" aria-label="日本語">🇯🇵</button>
-        <button class="lang-btn" data-lang="ko" type="button" title="한국어" aria-label="한국어">🇰🇷</button>
-      </nav>
-
       <section class="start-screen" id="start-screen">
+        <nav class="lang-bar" id="lang-bar" aria-label="Select language">
+          <button class="lang-btn is-active" data-lang="en" type="button" title="English" aria-label="English">🇬🇧</button>
+          <button class="lang-btn" data-lang="it" type="button" title="Italiano" aria-label="Italiano">🇮🇹</button>
+          <button class="lang-btn" data-lang="de" type="button" title="Deutsch" aria-label="Deutsch">🇩🇪</button>
+          <button class="lang-btn" data-lang="es" type="button" title="Español" aria-label="Español">🇪🇸</button>
+          <button class="lang-btn" data-lang="fr" type="button" title="Français" aria-label="Français">🇫🇷</button>
+          <button class="lang-btn" data-lang="zh" type="button" title="中文" aria-label="中文">🇨🇳</button>
+          <button class="lang-btn" data-lang="ja" type="button" title="日本語" aria-label="日本語">🇯🇵</button>
+          <button class="lang-btn" data-lang="ko" type="button" title="한국어" aria-label="한국어">🇰🇷</button>
+        </nav>
+
         <div class="start-content">
           <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
           <div class="start-copy">
@@ -71,6 +72,7 @@
           <span class="ar-spark ar-spark-two">✦</span>
           <div class="ar-orb" id="ar-orb">AR</div>
           <img id="ar-media-preview" class="ar-media-preview" hidden alt="AR Media" />
+          <model-viewer id="ar-3d-model" class="ar-3d-model" hidden auto-rotate camera-controls shadow-intensity="1" exposure="1" interaction-prompt="none" alt="ISMAR 3D Model"></model-viewer>
           <div class="ar-text-group">
             <p class="ar-kicker">ISMAR 2026</p>
             <h2 id="content-title">Welcome to Bari</h2>
@@ -78,11 +80,16 @@
           </div>
         </article>
 
-        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale and position controls">
+        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls">
           <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
           <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
           <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
-          <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position and size" title="Reset">↺</button>
+          <span class="ar-tool-divider" aria-hidden="true"></span>
+          <button class="ar-tool-btn" id="btn-rot-left" type="button" aria-label="Rotate left" title="Rotate left 15°">↶</button>
+          <button class="ar-tool-btn" id="btn-rot-right" type="button" aria-label="Rotate right" title="Rotate right 15°">↷</button>
+          <button class="ar-tool-btn ar-tool-3d" id="btn-toggle-3d" type="button" aria-label="Toggle 3D tilt mode" title="3D Tilt Mode">3D</button>
+          <span class="ar-tool-divider" aria-hidden="true"></span>
+          <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position, scale and rotation" title="Reset">↺</button>
         </div>
 
         <nav class="camera-controls" aria-label="Camera controls">
@@ -107,6 +114,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=8"></script>
+    <script type="module" src="./src/app.js?v=9"></script>
   </body>
 </html>

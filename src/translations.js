@@ -23,7 +23,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "Augmented Reality Experience",
-    arMoveHint: "Drag to move · Pinch to resize",
+    arMoveHint: "Drag to move · Pinch to resize · Rotate in 2D & 3D",
+    ar3dModeActive: "3D Mode active: drag to tilt & rotate in 3D",
     contents: {
       welcome: { title: "Welcome to Bari", description: "Your XR venue journey starts here." },
       food: { title: "Taste Puglia", description: "An augmented voyage through local flavors and traditions." },
@@ -54,7 +55,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "Esperienza in Realtà Aumentata",
-    arMoveHint: "Trascina per spostare · Pizzica per ridimensionare",
+    arMoveHint: "Trascina per spostare · Pizzica per ridimensionare · Ruota in 2D e 3D",
+    ar3dModeActive: "Modalità 3D attiva: trascina per inclinare e ruotare in 3D",
     contents: {
       welcome: { title: "Welcome to Bari", description: "La tua esperienza XR inizia qui." },
       food: { title: "Taste Puglia", description: "Un viaggio aumentato tra sapori e tradizioni." },
@@ -85,7 +87,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "Augmented-Reality-Erlebnis",
-    arMoveHint: "Ziehen zum Bewegen · Aufziehen zum Skalieren",
+    arMoveHint: "Ziehen zum Bewegen · Aufziehen zum Skalieren · Drehen in 2D & 3D",
+    ar3dModeActive: "3D-Modus aktiv: Ziehen zum Neigen und Drehen in 3D",
     contents: {
       welcome: { title: "Willkommen in Bari", description: "Deine XR-Erfahrung beginnt hier." },
       food: { title: "Geschmack Apuliens", description: "Eine AR-Reise durch Spezialitäten und Traditionen." },
@@ -116,7 +119,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "Experiencia de Realidad Aumentada",
-    arMoveHint: "Arrastra para mover · Pellizca para redimensionar",
+    arMoveHint: "Arrastra para mover · Pellizca para redimensionar · Gira en 2D y 3D",
+    ar3dModeActive: "Modo 3D activo: arrastra para inclinar y rotar en 3D",
     contents: {
       welcome: { title: "Bienvenido a Bari", description: "Tu viaje XR comienza aquí." },
       food: { title: "Sabores de Puglia", description: "Un viaje aumentado por los sabores y tradiciones locales." },
@@ -147,7 +151,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "Expérience de Réalité Augmentée",
-    arMoveHint: "Glisser pour déplacer · Pincer pour redimensionner",
+    arMoveHint: "Glisser pour déplacer · Pincer pour redimensionner · Tourner en 2D et 3D",
+    ar3dModeActive: "Mode 3D actif : faites glisser pour incliner et pivoter en 3D",
     contents: {
       welcome: { title: "Bienvenue à Bari", description: "Votre voyage XR commence ici." },
       food: { title: "Saveurs des Pouilles", description: "Un voyage augmenté à travers saveurs et traditions locales." },
@@ -178,7 +183,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "增强现实互动体验",
-    arMoveHint: "拖动调整位置 · 双指缩放大小",
+    arMoveHint: "拖动平移 · 双指缩放 · 支持 2D/3D 旋转视角",
+    ar3dModeActive: "3D模式已激活：拖动以在3D空间中倾斜和旋转",
     contents: {
       welcome: { title: "欢迎来到巴里", description: "您的 XR 之旅从这里正式开启。" },
       food: { title: "品味普利亚", description: "沉浸式探索普利亚地道美食与历史风情。" },
@@ -209,7 +215,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "拡張現実インタラクティブ体験",
-    arMoveHint: "ドラッグで移動 · ピンチで拡大縮小",
+    arMoveHint: "ドラッグで移動 · ピンチで拡大縮小 · 2D/3D回転に対応",
+    ar3dModeActive: "3Dモード有効：ドラッグして3D空間で傾きと回転を操作",
     contents: {
       welcome: { title: "バーリへようこそ", description: "ここからあなたのXRの旅が始まります。" },
       food: { title: "プーリアの美味", description: "地域の伝統と美食をめぐるARツアー。" },
@@ -240,7 +247,8 @@ export const translations = {
     shareTitle: "ISMAR 2026 AR",
     watermark: "XR venue experience · #ISMAR2026",
     mediaScanDescription: "증강 현실 인터랙티브 경험",
-    arMoveHint: "드래그하여 이동 · 핀치하여 크기 조절",
+    arMoveHint: "드래그하여 이동 · 핀치하여 크기 조절 · 2D 및 3D 회전",
+    ar3dModeActive: "3D 모드 활성화: 드래그하여 3D 공간에서 기울이기 및 회전",
     contents: {
       welcome: { title: "바리에 오신 것을 환영합니다", description: "당신의 특별한 XR 여정이 여기서 시작됩니다." },
       food: { title: "풀리아의 맛", description: "현지 미식과 전통을 만나는 증강현실 여행." },

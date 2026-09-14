@@ -33,8 +33,12 @@ logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
 
 const arOrb = document.querySelector('#ar-orb');
 const arMediaPreview = document.querySelector('#ar-media-preview');
+const ar3dModel = document.querySelector('#ar-3d-model');
 const btnZoomIn = document.querySelector('#btn-zoom-in');
 const btnZoomOut = document.querySelector('#btn-zoom-out');
+const btnRotLeft = document.querySelector('#btn-rot-left');
+const btnRotRight = document.querySelector('#btn-rot-right');
+const btnToggle3d = document.querySelector('#btn-toggle-3d');
 const btnResetTransform = document.querySelector('#btn-reset-transform');
 const arScaleBadge = document.querySelector('#ar-scale-badge');
 
@@ -45,6 +49,11 @@ const mediaParam = params.get('media');
 let userOffsetX = 0;
 let userOffsetY = 0;
 let userScale = 1.0;
+let userRotateZ = 0;
+let userRotateX = 0;
+let userRotateY = 0;
+let is3dMode = false;
+let is3dModel = false;
 let baseAnchorX = window.innerWidth / 2;
 let baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.35);
 let baseAngle = 0;
@@ -64,11 +73,9 @@ function applyArTransform() {
   arContent.style.left = `${posX}px`;
   arContent.style.top = `${posY}px`;
 
-  if (mediaParam) {
-    arContent.style.transform = `translate(-50%, -50%) rotate(${baseAngle}deg) scale(${userScale})`;
-  } else {
-    arContent.style.transform = `translate(-50%, -100%) rotate(${baseAngle}deg) scale(${userScale})`;
-  }
+  const translatePart = (mediaParam || is3dModel) ? 'translate(-50%, -50%)' : 'translate(-50%, -100%)';
+  const totalAngleZ = baseAngle + userRotateZ;
+  arContent.style.transform = `${translatePart} perspective(1000px) rotateX(${userRotateX}deg) rotateY(${userRotateY}deg) rotateZ(${totalAngleZ}deg) scale(${userScale})`;
 }
 
 if (mediaParam) {
@@ -88,6 +95,17 @@ if (mediaParam) {
       mediaLoaded = true;
     };
     mediaImage.src = mediaParam;
+  } else if (['glb', 'gltf'].includes(ext)) {
+    is3dModel = true;
+    if (arContent) {
+      arContent.classList.add('is-media-only');
+    }
+    if (arOrb && arMediaPreview && ar3dModel) {
+      arOrb.hidden = true;
+      arMediaPreview.hidden = true;
+      ar3dModel.hidden = false;
+      ar3dModel.src = mediaParam;
+    }
   }
 }
 
@@ -243,13 +261,13 @@ function showFallbackMarker() {
   marker = null;
   arContent.hidden = false;
   baseAnchorX = window.innerWidth / 2;
-  baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.35);
+  baseAnchorY = window.innerHeight * ((mediaParam || is3dModel) ? 0.46 : 0.35);
   baseAngle = 0;
   applyArTransform();
   markerGuide.classList.remove('is-hidden');
 }
 
-function drawArCard(context, width, height) {
+function drawArCard(context, width, height, modelSnapshotImg = null) {
   const rect = camera.getBoundingClientRect();
   const screenW = rect.width || window.innerWidth;
   const screenH = rect.height || window.innerHeight;
@@ -257,29 +275,49 @@ function drawArCard(context, width, height) {
   const currentScreenY = baseAnchorY + userOffsetY;
   const canvasTargetX = (currentScreenX / screenW) * width;
   const canvasTargetY = (currentScreenY / screenH) * height;
+  const totalAngleZ = baseAngle + userRotateZ;
+  const scale = Math.min(width / 390, height / 844) * userScale;
 
-  if (mediaParam && mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
-    const scale = Math.min(width / 390, height / 844) * userScale;
+  const tiltScaleX = Math.cos((userRotateY * Math.PI) / 180);
+  const tiltScaleY = Math.cos((userRotateX * Math.PI) / 180);
+
+  if (is3dModel && modelSnapshotImg && modelSnapshotImg.naturalWidth) {
     const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
-    const x = canvasTargetX - mediaSize / 2;
-    const y = canvasTargetY - mediaSize / 2;
-
     context.save();
+    context.translate(canvasTargetX, canvasTargetY);
+    context.rotate((totalAngleZ * Math.PI) / 180);
+    context.scale(tiltScaleX, tiltScaleY);
     context.shadowColor = 'rgba(0, 0, 0, 0.5)';
     context.shadowBlur = 32 * scale;
     context.shadowOffsetY = 16 * scale;
-    context.drawImage(mediaImage, x, y, mediaSize, mediaSize);
+    context.drawImage(modelSnapshotImg, -mediaSize / 2, -mediaSize / 2, mediaSize, mediaSize);
+    context.restore();
+    return;
+  }
+
+  if (mediaParam && mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
+    const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
+    context.save();
+    context.translate(canvasTargetX, canvasTargetY);
+    context.rotate((totalAngleZ * Math.PI) / 180);
+    context.scale(tiltScaleX, tiltScaleY);
+    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    context.shadowBlur = 32 * scale;
+    context.shadowOffsetY = 16 * scale;
+    context.drawImage(mediaImage, -mediaSize / 2, -mediaSize / 2, mediaSize, mediaSize);
     context.restore();
     return;
   }
 
   const currentContent = getCurrentContent();
-  const scale = Math.min(width / 390, height / 844) * userScale;
   const cardWidth = 292 * scale;
   const cardHeight = 104 * scale;
 
   context.save();
   context.translate(canvasTargetX, canvasTargetY);
+  context.rotate((totalAngleZ * Math.PI) / 180);
+  context.scale(tiltScaleX, tiltScaleY);
+
   context.fillStyle = '#3d1209aa';
   roundRect(context, -cardWidth / 2 + 5 * scale, -cardHeight + 7 * scale, cardWidth, cardHeight, 18 * scale);
   context.fill();
@@ -364,7 +402,25 @@ async function capturePhoto() {
   canvas.height = height;
   const context = canvas.getContext('2d');
   context.drawImage(camera, 0, 0, width, height);
-  drawArCard(context, width, height);
+
+  let modelSnapshotImg = null;
+  if (is3dModel && ar3dModel && !ar3dModel.hidden && typeof ar3dModel.toDataURL === 'function') {
+    try {
+      const modelUrl = await ar3dModel.toDataURL('image/png');
+      if (modelUrl) {
+        modelSnapshotImg = new Image();
+        await new Promise((resolve) => {
+          modelSnapshotImg.onload = resolve;
+          modelSnapshotImg.onerror = resolve;
+          modelSnapshotImg.src = modelUrl;
+        });
+      }
+    } catch (e) {
+      console.warn('Could not capture model-viewer snapshot', e);
+    }
+  }
+
+  drawArCard(context, width, height, modelSnapshotImg);
   if (isFramed) drawFrame(context, width, height);
 
   currentPhotoDataUrl = canvas.toDataURL('image/jpeg', .92);
@@ -421,15 +477,24 @@ resetMarker.addEventListener('click', () => {
   userOffsetX = 0;
   userOffsetY = 0;
   userScale = 1.0;
+  userRotateZ = 0;
+  userRotateX = 0;
+  userRotateY = 0;
+  is3dMode = false;
+  if (btnToggle3d) {
+    btnToggle3d.classList.remove('is-active');
+    btnToggle3d.setAttribute('aria-pressed', 'false');
+  }
   updateScaleDisplay();
   applyArTransform();
   setMessage(t.pointAgainHint);
 });
 
-// Gestione Trascinamento AR (Touch & Mouse Drag)
+// Gestione Trascinamento AR & Rotazione Spaziale 3D (Touch & Mouse Drag)
 let isDragging = false;
 let startPointerX = 0, startPointerY = 0;
 let origOffsetX = 0, origOffsetY = 0;
+let origRotateX = 0, origRotateY = 0;
 
 arContent.addEventListener('pointerdown', (e) => {
   isDragging = true;
@@ -437,14 +502,26 @@ arContent.addEventListener('pointerdown', (e) => {
   startPointerY = e.clientY;
   origOffsetX = userOffsetX;
   origOffsetY = userOffsetY;
+  origRotateX = userRotateX;
+  origRotateY = userRotateY;
   arContent.classList.add('is-dragging');
   arContent.setPointerCapture(e.pointerId);
 });
 
 arContent.addEventListener('pointermove', (e) => {
   if (!isDragging) return;
-  userOffsetX = origOffsetX + (e.clientX - startPointerX);
-  userOffsetY = origOffsetY + (e.clientY - startPointerY);
+  const dx = e.clientX - startPointerX;
+  const dy = e.clientY - startPointerY;
+
+  if (is3dMode) {
+    // Modalità 3D: orientamento su asse Y (yaw orizzontale) e asse X (pitch verticale)
+    userRotateY = Math.max(-85, Math.min(85, origRotateY + dx * 0.45));
+    userRotateX = Math.max(-85, Math.min(85, origRotateX - dy * 0.45));
+  } else {
+    // Normale traslazione 2D
+    userOffsetX = origOffsetX + dx;
+    userOffsetY = origOffsetY + dy;
+  }
   applyArTransform();
 });
 
@@ -460,9 +537,11 @@ const stopDrag = (e) => {
 arContent.addEventListener('pointerup', stopDrag);
 arContent.addEventListener('pointercancel', stopDrag);
 
-// Pinch-to-zoom (2 dita su schermo touch)
+// Pinch-to-zoom & Twist-to-rotate (2 dita su schermo touch: scala e rotazione 2D)
 let initialPinchDist = 0;
 let initialPinchScale = 1.0;
+let initialTwistAngle = 0;
+let initialRotateZ = 0;
 
 window.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
@@ -470,6 +549,8 @@ window.addEventListener('touchstart', (e) => {
     const p2 = e.touches[1];
     initialPinchDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
     initialPinchScale = userScale;
+    initialTwistAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+    initialRotateZ = userRotateZ;
   }
 }, { passive: true });
 
@@ -481,6 +562,11 @@ window.addEventListener('touchmove', (e) => {
     const factor = currentDist / initialPinchDist;
     userScale = Math.min(3.5, Math.max(0.3, initialPinchScale * factor));
     updateScaleDisplay();
+
+    const currentAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
+    const angleDiff = currentAngle - initialTwistAngle;
+    userRotateZ = Math.round((initialRotateZ + angleDiff) % 360);
+
     applyArTransform();
   }
 }, { passive: true });
@@ -500,7 +586,7 @@ arContent.addEventListener('wheel', (e) => {
   applyArTransform();
 }, { passive: false });
 
-// Controlli Zoom a schermo
+// Controlli Zoom, Rotazione e Modalità 3D
 if (btnZoomIn) {
   btnZoomIn.addEventListener('click', () => {
     userScale = Math.min(3.5, userScale + 0.15);
@@ -517,11 +603,47 @@ if (btnZoomOut) {
   });
 }
 
+if (btnRotLeft) {
+  btnRotLeft.addEventListener('click', () => {
+    userRotateZ = (userRotateZ - 15) % 360;
+    applyArTransform();
+  });
+}
+
+if (btnRotRight) {
+  btnRotRight.addEventListener('click', () => {
+    userRotateZ = (userRotateZ + 15) % 360;
+    applyArTransform();
+  });
+}
+
+if (btnToggle3d) {
+  btnToggle3d.addEventListener('click', () => {
+    is3dMode = !is3dMode;
+    btnToggle3d.classList.toggle('is-active', is3dMode);
+    btnToggle3d.setAttribute('aria-pressed', String(is3dMode));
+    const t = getT();
+    if (is3dMode) {
+      setMessage(t.ar3dModeActive || 'Modalità 3D attiva: trascina per inclinare e ruotare nello spazio');
+    } else {
+      setMessage(t.arMoveHint || 'Trascina per spostare · Pizzica o usa i tasti per ruotare e ridimensionare');
+    }
+  });
+}
+
 if (btnResetTransform) {
   btnResetTransform.addEventListener('click', () => {
     userOffsetX = 0;
     userOffsetY = 0;
     userScale = 1.0;
+    userRotateZ = 0;
+    userRotateX = 0;
+    userRotateY = 0;
+    is3dMode = false;
+    if (btnToggle3d) {
+      btnToggle3d.classList.remove('is-active');
+      btnToggle3d.setAttribute('aria-pressed', 'false');
+    }
     updateScaleDisplay();
     applyArTransform();
   });
