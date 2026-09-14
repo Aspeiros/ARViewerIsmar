@@ -28,6 +28,7 @@ let currentPhotoDataUrl;
 let animationId;
 let detector;
 let marker = null;
+let markerFoundPreviously = false;
 const logo = new Image();
 logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
 
@@ -131,8 +132,24 @@ function getCurrentContent() {
   return t.contents[contentKey] || t.contents.welcome || { title: 'ISMAR 2026', description: '' };
 }
 
-function setMessage(text) {
+let messageTimeout = null;
+function setMessage(text, autoClearMs = 0) {
+  if (messageTimeout) {
+    clearTimeout(messageTimeout);
+    messageTimeout = null;
+  }
   message.textContent = text;
+  message.style.opacity = '1';
+  if (autoClearMs > 0) {
+    messageTimeout = setTimeout(() => {
+      message.style.opacity = '0';
+      setTimeout(() => {
+        if (message.style.opacity === '0') {
+          message.textContent = '';
+        }
+      }, 300);
+    }, autoClearMs);
+  }
 }
 
 function updateTranslations() {
@@ -228,9 +245,13 @@ async function scanForMarker() {
       markerGuide.classList.add('is-hidden');
       trackingHint.classList.add('is-tracking');
       trackingText.textContent = t.trackingHintFound;
-      setMessage(t.arMoveHint ? `${t.photoSuccessHint} · ${t.arMoveHint}` : t.photoSuccessHint);
+      if (!markerFoundPreviously) {
+        markerFoundPreviously = true;
+        setMessage(t.photoSuccessHint, 4500);
+      }
     } else if (!marker) {
       arContent.hidden = true;
+      markerFoundPreviously = false;
     }
   } catch (error) {
     console.warn('Errore lettura marker', error);
@@ -470,6 +491,7 @@ saveButton.addEventListener('click', savePhoto);
 resetMarker.addEventListener('click', () => {
   const t = getT();
   marker = null;
+  markerFoundPreviously = false;
   trackingHint.classList.remove('is-tracking');
   trackingText.textContent = t.trackingHintLooking;
   markerGuide.classList.remove('is-hidden');
@@ -624,9 +646,9 @@ if (btnToggle3d) {
     btnToggle3d.setAttribute('aria-pressed', String(is3dMode));
     const t = getT();
     if (is3dMode) {
-      setMessage(t.ar3dModeActive || 'Modalità 3D attiva: trascina per inclinare e ruotare nello spazio');
+      setMessage(t.ar3dModeActive || 'Modalità 3D attiva: trascina per inclinare e ruotare nello spazio', 3500);
     } else {
-      setMessage(t.arMoveHint || 'Trascina per spostare · Pizzica o usa i tasti per ruotare e ridimensionare');
+      setMessage(t.arMoveHint || 'Trascina per spostare · Pizzica o usa i tasti per ruotare e ridimensionare', 3500);
     }
   });
 }
