@@ -1,4 +1,6 @@
 import { translations } from './translations.js';
+import { GifReader } from './omggif.js';
+import { GIFEncoder, quantize, applyPalette } from './gifenc.js';
 
 const camera = document.querySelector('#camera');
 const canvas = document.querySelector('#capture-canvas');
@@ -40,8 +42,14 @@ const btnZoomOut = document.querySelector('#btn-zoom-out');
 const btnRotLeft = document.querySelector('#btn-rot-left');
 const btnRotRight = document.querySelector('#btn-rot-right');
 const btnToggle3d = document.querySelector('#btn-toggle-3d');
+const btnTogglePause = document.querySelector('#btn-toggle-pause');
 const btnResetTransform = document.querySelector('#btn-reset-transform');
 const arScaleBadge = document.querySelector('#ar-scale-badge');
+
+const btnModePhoto = document.querySelector('#btn-mode-photo');
+const btnModeGif = document.querySelector('#btn-mode-gif');
+const shutterCountdown = document.querySelector('#shutter-countdown');
+const shutterRingProgress = document.querySelector('#shutter-ring-progress');
 
 const params = new URLSearchParams(window.location.search);
 const contentKey = params.get('content') || 'welcome';
@@ -61,6 +69,76 @@ let baseAngle = 0;
 
 let mediaImage = null;
 let mediaLoaded = false;
+
+// Gestione Pausa e Frame GIF
+let isPaused = false;
+let pausedFrameIndex = 0;
+let decodedGifFrames = [];
+let gifTotalDuration = 0;
+let gifStartTime = performance.now();
+
+// Gestione Modalità Scatto (Foto vs GIF 6s)
+let captureMode = 'photo'; // 'photo' | 'gif'
+let isRecordingGif = false;
+let gifRecordInterval = null;
+let gifRecordFrames = [];
+let currentGifBlob = null;
+let currentGifDataUrl = null;
+
+async function loadGifFrames(url) {
+  try {
+    const res = await fetch(url);
+    const buf = await res.arrayBuffer();
+    const reader = new GifReader(new Uint8Array(buf));
+    const numFrames = reader.numFrames();
+    const width = reader.width;
+    const height = reader.height;
+    const pixels = new Uint8ClampedArray(width * height * 4);
+
+    decodedGifFrames = [];
+    gifTotalDuration = 0;
+
+    for (let i = 0; i < numFrames; i++) {
+      reader.decodeAndBlitFrameRGBA(i, pixels);
+      const fCanvas = document.createElement('canvas');
+      fCanvas.width = width;
+      fCanvas.height = height;
+      const fCtx = fCanvas.getContext('2d');
+      const imgData = fCtx.createImageData(width, height);
+      imgData.data.set(pixels);
+      fCtx.putImageData(imgData, 0, 0);
+
+      const delay = (reader.frameInfo(i).delay || 10) * 10;
+      decodedGifFrames.push({
+        canvas: fCanvas,
+        delay: delay,
+        time: gifTotalDuration
+      });
+      gifTotalDuration += delay;
+    }
+    gifStartTime = performance.now();
+  } catch (err) {
+    console.warn('Impossibile decodificare i singoli frame GIF:', err);
+  }
+}
+
+function getCurrentGifFrame() {
+  if (!decodedGifFrames.length) return null;
+  if (isPaused) {
+    return decodedGifFrames[pausedFrameIndex] || decodedGifFrames[0];
+  }
+  if (!gifTotalDuration) return decodedGifFrames[0];
+  const elapsed = (performance.now() - gifStartTime) % gifTotalDuration;
+  let accumulated = 0;
+  for (let i = 0; i < decodedGifFrames.length; i++) {
+    accumulated += decodedGifFrames[i].delay;
+    if (elapsed <= accumulated) {
+      pausedFrameIndex = i;
+      return decodedGifFrames[i];
+    }
+  }
+  return decodedGifFrames[0];
+}
 
 function updateScaleDisplay() {
   if (arScaleBadge) {
@@ -96,6 +174,10 @@ if (mediaParam) {
       mediaLoaded = true;
     };
     mediaImage.src = mediaParam;
+
+    if (ext === 'gif') {
+      loadGifFrames(mediaParam);
+    }
   } else if (['glb', 'gltf'].includes(ext)) {
     is3dModel = true;
     if (arContent) {
@@ -168,6 +250,17 @@ function updateTranslations() {
 
   switchCameraButton.setAttribute('title', t.switchCameraTitle);
   switchCameraButton.setAttribute('aria-label', t.switchCameraTitle);
+
+  if (btnModePhoto) btnModePhoto.textContent = t.modePhoto || 'Photo';
+  if (btnModeGif) btnModeGif.textContent = t.modeGif || 'GIF 6s';
+  if (btnTogglePause) {
+    const pauseTitle = isPaused ? (t.animResumed || 'Riprendi') : (t.animPaused || 'Pausa');
+    btnTogglePause.setAttribute('title', pauseTitle);
+    btnTogglePause.setAttribute('aria-label', pauseTitle);
+  }
+  if (saveButton) {
+    saveButton.textContent = (captureMode === 'gif') ? (t.saveGif || 'Save GIF') : (t.savePhoto || 'Save photo');
+  }
 
   langBtns.forEach((btn) => {
     const isActive = btn.getAttribute('data-lang') === currentLang;
@@ -316,18 +409,22 @@ function drawArCard(context, width, height, modelSnapshotImg = null) {
     return;
   }
 
-  if (mediaParam && mediaLoaded && mediaImage?.complete && mediaImage?.naturalWidth) {
-    const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
-    context.save();
-    context.translate(canvasTargetX, canvasTargetY);
-    context.rotate((totalAngleZ * Math.PI) / 180);
-    context.scale(tiltScaleX, tiltScaleY);
-    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    context.shadowBlur = 32 * scale;
-    context.shadowOffsetY = 16 * scale;
-    context.drawImage(mediaImage, -mediaSize / 2, -mediaSize / 2, mediaSize, mediaSize);
-    context.restore();
-    return;
+  if (mediaParam && mediaLoaded) {
+    const activeFrame = getCurrentGifFrame();
+    const sourceDrawable = activeFrame ? activeFrame.canvas : (mediaImage?.complete && mediaImage?.naturalWidth ? mediaImage : null);
+    if (sourceDrawable) {
+      const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
+      context.save();
+      context.translate(canvasTargetX, canvasTargetY);
+      context.rotate((totalAngleZ * Math.PI) / 180);
+      context.scale(tiltScaleX, tiltScaleY);
+      context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      context.shadowBlur = 32 * scale;
+      context.shadowOffsetY = 16 * scale;
+      context.drawImage(sourceDrawable, -mediaSize / 2, -mediaSize / 2, mediaSize, mediaSize);
+      context.restore();
+      return;
+    }
   }
 
   const currentContent = getCurrentContent();
@@ -411,6 +508,149 @@ function roundRect(context, x, y, width, height, radius) {
   context.closePath();
 }
 
+let originalGifSrc = null;
+
+async function getModelSnapshot() {
+  if (is3dModel && ar3dModel && !ar3dModel.hidden && typeof ar3dModel.toDataURL === 'function') {
+    try {
+      const modelUrl = await ar3dModel.toDataURL('image/png');
+      if (modelUrl) {
+        const img = new Image();
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+          img.src = modelUrl;
+        });
+        return img;
+      }
+    } catch (e) {
+      console.warn('Could not capture model-viewer snapshot', e);
+    }
+  }
+  return null;
+}
+
+const GIF_DURATION_MS = 6000;
+const GIF_INTERVAL_MS = 140; // ~7 fps -> ~42 frames
+
+async function startRecordingGif() {
+  const t = getT();
+  if (!camera.videoWidth || camera.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+    setMessage(t.cameraStarting);
+    return;
+  }
+  if (isRecordingGif) return;
+
+  isRecordingGif = true;
+  gifRecordFrames = [];
+  captureButton.classList.add('is-recording');
+  if (shutterCountdown) {
+    shutterCountdown.hidden = false;
+    shutterCountdown.textContent = '6s';
+  }
+  if (shutterRingProgress) {
+    shutterRingProgress.style.strokeDashoffset = '207.34';
+  }
+  setMessage(t.recordingGif || 'Registrazione GIF...', GIF_DURATION_MS);
+
+  const videoW = camera.videoWidth;
+  const videoH = camera.videoHeight;
+  const targetW = 390;
+  const targetH = Math.round((videoH / videoW) * targetW);
+
+  const offscreen = document.createElement('canvas');
+  offscreen.width = targetW;
+  offscreen.height = targetH;
+  const offCtx = offscreen.getContext('2d', { willReadFrequently: true });
+
+  const startTime = performance.now();
+
+  const recordFrame = async () => {
+    if (!isRecordingGif) return;
+    const elapsed = performance.now() - startTime;
+    const remainingSec = Math.max(1, Math.ceil((GIF_DURATION_MS - elapsed) / 1000));
+    if (shutterCountdown) shutterCountdown.textContent = `${remainingSec}s`;
+
+    if (shutterRingProgress) {
+      const progress = Math.min(1, elapsed / GIF_DURATION_MS);
+      shutterRingProgress.style.strokeDashoffset = (207.34 * (1 - progress)).toString();
+    }
+
+    let modelSnapshotImg = await getModelSnapshot();
+    offCtx.drawImage(camera, 0, 0, targetW, targetH);
+    drawArCard(offCtx, targetW, targetH, modelSnapshotImg);
+    if (isFramed) drawFrame(offCtx, targetW, targetH);
+
+    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+    gifRecordFrames.push({
+      data: imgData.data,
+      width: targetW,
+      height: targetH,
+      delay: GIF_INTERVAL_MS
+    });
+
+    if (elapsed >= GIF_DURATION_MS) {
+      stopRecordingGif();
+    }
+  };
+
+  await recordFrame();
+  gifRecordInterval = setInterval(recordFrame, GIF_INTERVAL_MS);
+}
+
+async function stopRecordingGif() {
+  if (!isRecordingGif) return;
+  isRecordingGif = false;
+  if (gifRecordInterval) {
+    clearInterval(gifRecordInterval);
+    gifRecordInterval = null;
+  }
+
+  captureButton.classList.remove('is-recording');
+  if (shutterCountdown) shutterCountdown.hidden = true;
+  if (shutterRingProgress) shutterRingProgress.style.strokeDashoffset = '207.34';
+
+  const t = getT();
+  setMessage(t.encodingGif || 'Creazione GIF...', 8000);
+
+  await new Promise((resolve) => setTimeout(resolve, 60));
+
+  try {
+    if (!gifRecordFrames.length) {
+      setMessage('');
+      return;
+    }
+
+    const gif = GIFEncoder();
+    const frameW = gifRecordFrames[0].width;
+    const frameH = gifRecordFrames[0].height;
+
+    for (const frame of gifRecordFrames) {
+      const palette = quantize(frame.data, 128, { format: 'rgb444' });
+      const index = applyPalette(frame.data, palette, 'rgb444');
+      gif.writeFrame(index, frameW, frameH, {
+        palette,
+        delay: frame.delay
+      });
+    }
+    gif.finish();
+
+    const gifBytes = gif.bytes();
+    if (currentGifDataUrl) {
+      URL.revokeObjectURL(currentGifDataUrl);
+    }
+    currentGifBlob = new Blob([gifBytes], { type: 'image/gif' });
+    currentGifDataUrl = URL.createObjectURL(currentGifBlob);
+
+    photoResult.src = currentGifDataUrl;
+    photoPreview.hidden = false;
+    setMessage('');
+  } catch (err) {
+    console.error('GIF encoding error', err);
+    setMessage('GIF error');
+  }
+}
+
 async function capturePhoto() {
   const t = getT();
   if (!camera.videoWidth || camera.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
@@ -424,22 +664,7 @@ async function capturePhoto() {
   const context = canvas.getContext('2d');
   context.drawImage(camera, 0, 0, width, height);
 
-  let modelSnapshotImg = null;
-  if (is3dModel && ar3dModel && !ar3dModel.hidden && typeof ar3dModel.toDataURL === 'function') {
-    try {
-      const modelUrl = await ar3dModel.toDataURL('image/png');
-      if (modelUrl) {
-        modelSnapshotImg = new Image();
-        await new Promise((resolve) => {
-          modelSnapshotImg.onload = resolve;
-          modelSnapshotImg.onerror = resolve;
-          modelSnapshotImg.src = modelUrl;
-        });
-      }
-    } catch (e) {
-      console.warn('Could not capture model-viewer snapshot', e);
-    }
-  }
+  let modelSnapshotImg = await getModelSnapshot();
 
   drawArCard(context, width, height, modelSnapshotImg);
   if (isFramed) drawFrame(context, width, height);
@@ -454,8 +679,27 @@ async function capturePhoto() {
 }
 
 async function savePhoto() {
-  if (!currentPhotoBlob) return;
   const t = getT();
+  if (captureMode === 'gif') {
+    if (!currentGifBlob) return;
+    const file = new File([currentGifBlob], 'ismar-2026-ar-animation.gif', { type: 'image/gif' });
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: t.shareTitle || 'ISMAR 2026 AR Animation' });
+        return;
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') return;
+    }
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(currentGifBlob);
+    link.download = file.name;
+    link.click();
+    URL.revokeObjectURL(link.href);
+    return;
+  }
+
+  if (!currentPhotoBlob) return;
   const file = new File([currentPhotoBlob], 'ismar-2026-ar-photo.jpg', { type: 'image/jpeg' });
   try {
     if (navigator.canShare?.({ files: [file] })) {
@@ -483,11 +727,59 @@ frameToggle.addEventListener('click', () => {
   frameToggle.classList.toggle('is-active', isFramed);
   frameToggle.setAttribute('aria-pressed', String(isFramed));
 });
-captureButton.addEventListener('click', capturePhoto);
+captureButton.addEventListener('click', () => {
+  if (captureMode === 'gif') {
+    if (isRecordingGif) {
+      stopRecordingGif();
+    } else {
+      startRecordingGif();
+    }
+  } else {
+    capturePhoto();
+  }
+});
 retakeButton.addEventListener('click', () => {
   photoPreview.hidden = true;
+  if (currentGifDataUrl) {
+    URL.revokeObjectURL(currentGifDataUrl);
+    currentGifDataUrl = null;
+    currentGifBlob = null;
+  }
 });
 saveButton.addEventListener('click', savePhoto);
+
+if (btnModePhoto) {
+  btnModePhoto.addEventListener('click', () => {
+    if (isRecordingGif) stopRecordingGif();
+    captureMode = 'photo';
+    btnModePhoto.classList.add('is-active');
+    btnModePhoto.setAttribute('aria-selected', 'true');
+    if (btnModeGif) {
+      btnModeGif.classList.remove('is-active');
+      btnModeGif.setAttribute('aria-selected', 'false');
+    }
+    captureButton.classList.remove('mode-is-gif');
+    const t = getT();
+    if (saveButton) saveButton.textContent = t.savePhoto || 'Save photo';
+  });
+}
+
+if (btnModeGif) {
+  btnModeGif.addEventListener('click', () => {
+    captureMode = 'gif';
+    btnModeGif.classList.add('is-active');
+    btnModeGif.setAttribute('aria-selected', 'true');
+    if (btnModePhoto) {
+      btnModePhoto.classList.remove('is-active');
+      btnModePhoto.setAttribute('aria-selected', 'false');
+    }
+    captureButton.classList.add('mode-is-gif');
+    const t = getT();
+    if (saveButton) saveButton.textContent = t.saveGif || 'Save GIF';
+    setMessage(t.modeGifHint || 'Modalità GIF 6s: tocca l\'otturatore per registrare', 3000);
+  });
+}
+
 resetMarker.addEventListener('click', () => {
   const t = getT();
   marker = null;
@@ -506,6 +798,20 @@ resetMarker.addEventListener('click', () => {
   if (btnToggle3d) {
     btnToggle3d.classList.remove('is-active');
     btnToggle3d.setAttribute('aria-pressed', 'false');
+  }
+  if (isPaused) {
+    isPaused = false;
+    if (btnTogglePause) {
+      btnTogglePause.classList.remove('is-paused');
+      btnTogglePause.setAttribute('aria-pressed', 'false');
+      btnTogglePause.textContent = '⏸';
+    }
+    if (arContent) arContent.classList.remove('is-paused');
+    if (originalGifSrc && arMediaPreview) arMediaPreview.src = originalGifSrc;
+    if (is3dModel && ar3dModel) {
+      ar3dModel.setAttribute('auto-rotate', '');
+      if (typeof ar3dModel.play === 'function') ar3dModel.play();
+    }
   }
   updateScaleDisplay();
   applyArTransform();
@@ -653,6 +959,51 @@ if (btnToggle3d) {
   });
 }
 
+if (btnTogglePause) {
+  btnTogglePause.addEventListener('click', () => {
+    isPaused = !isPaused;
+    const t = getT();
+    btnTogglePause.classList.toggle('is-paused', isPaused);
+    btnTogglePause.setAttribute('aria-pressed', String(isPaused));
+    btnTogglePause.textContent = isPaused ? '▶' : '⏸';
+    const pauseTitle = isPaused ? (t.animResumed || 'Riprendi') : (t.animPaused || 'Pausa');
+    btnTogglePause.setAttribute('title', pauseTitle);
+    btnTogglePause.setAttribute('aria-label', pauseTitle);
+
+    if (arContent) {
+      arContent.classList.toggle('is-paused', isPaused);
+    }
+
+    if (mediaParam && mediaParam.toLowerCase().endsWith('.gif')) {
+      if (isPaused) {
+        const currentFrame = getCurrentGifFrame();
+        if (currentFrame && arMediaPreview) {
+          if (!originalGifSrc) originalGifSrc = arMediaPreview.src;
+          arMediaPreview.src = currentFrame.canvas.toDataURL();
+        }
+      } else {
+        if (originalGifSrc && arMediaPreview) {
+          arMediaPreview.src = originalGifSrc;
+        }
+        gifStartTime = performance.now() - (decodedGifFrames[pausedFrameIndex]?.time || 0);
+      }
+    }
+
+    if (is3dModel && ar3dModel) {
+      if (isPaused) {
+        ar3dModel.removeAttribute('auto-rotate');
+        if (typeof ar3dModel.pause === 'function') ar3dModel.pause();
+      } else {
+        ar3dModel.setAttribute('auto-rotate', '');
+        if (typeof ar3dModel.play === 'function') ar3dModel.play();
+      }
+    }
+
+    const msg = isPaused ? (t.animPaused || 'Animazione in pausa') : (t.animResumed || 'Animazione ripresa');
+    setMessage(msg, 2000);
+  });
+}
+
 if (btnResetTransform) {
   btnResetTransform.addEventListener('click', () => {
     userOffsetX = 0;
@@ -665,6 +1016,20 @@ if (btnResetTransform) {
     if (btnToggle3d) {
       btnToggle3d.classList.remove('is-active');
       btnToggle3d.setAttribute('aria-pressed', 'false');
+    }
+    if (isPaused) {
+      isPaused = false;
+      if (btnTogglePause) {
+        btnTogglePause.classList.remove('is-paused');
+        btnTogglePause.setAttribute('aria-pressed', 'false');
+        btnTogglePause.textContent = '⏸';
+      }
+      if (arContent) arContent.classList.remove('is-paused');
+      if (originalGifSrc && arMediaPreview) arMediaPreview.src = originalGifSrc;
+      if (is3dModel && ar3dModel) {
+        ar3dModel.setAttribute('auto-rotate', '');
+        if (typeof ar3dModel.play === 'function') ar3dModel.play();
+      }
     }
     updateScaleDisplay();
     applyArTransform();

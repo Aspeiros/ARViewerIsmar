@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=10" />
+    <link rel="stylesheet" href="./src/styles.css?v=11" />
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
   </head>
   <body>
@@ -89,6 +89,7 @@
           <button class="ar-tool-btn" id="btn-rot-right" type="button" aria-label="Rotate right" title="Rotate right 15°">↷</button>
           <button class="ar-tool-btn ar-tool-3d" id="btn-toggle-3d" type="button" aria-label="Toggle 3D tilt mode" title="3D Tilt Mode">3D</button>
           <span class="ar-tool-divider" aria-hidden="true"></span>
+          <button class="ar-tool-btn ar-tool-pause" id="btn-toggle-pause" type="button" aria-label="Pause animation" title="Pause / Resume animation">⏸</button>
           <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position, scale and rotation" title="Reset">↺</button>
         </div>
 
@@ -97,9 +98,20 @@
             <span class="frame-swatch" aria-hidden="true"></span>
             <span id="frame-toggle-text" data-i18n="frameToggle">ISMAR Frame</span>
           </button>
-          <button class="shutter" id="capture-button" type="button" aria-label="Take photo">
-            <span></span>
-          </button>
+          <div class="shutter-col">
+            <div class="mode-switch-pill" id="mode-switch-pill" role="tablist" aria-label="Capture mode">
+              <button class="mode-pill-btn is-active" id="btn-mode-photo" type="button" role="tab" aria-selected="true" data-i18n="modePhoto">Photo</button>
+              <button class="mode-pill-btn" id="btn-mode-gif" type="button" role="tab" aria-selected="false" data-i18n="modeGif">GIF 6s</button>
+            </div>
+            <button class="shutter" id="capture-button" type="button" aria-label="Take photo">
+              <span class="shutter-inner"></span>
+              <svg class="shutter-ring-svg" viewBox="0 0 76 76" aria-hidden="true">
+                <circle class="shutter-ring-bg" cx="38" cy="38" r="33"></circle>
+                <circle class="shutter-ring-progress" id="shutter-ring-progress" cx="38" cy="38" r="33"></circle>
+              </svg>
+              <span class="shutter-countdown-text" id="shutter-countdown" hidden>6s</span>
+            </button>
+          </div>
           <button class="secondary-control" id="reset-marker" type="button" data-i18n="recalibrate">Recalibrate</button>
         </nav>
       </section>
@@ -114,6 +126,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=10"></script>
+    <script type="module" src="./src/app.js?v=11"></script>
   </body>
 </html>
