@@ -24,6 +24,8 @@ const langBtns = document.querySelectorAll('.lang-btn');
 
 let stream;
 let facingMode = 'environment';
+const FRAME_STYLES = ['classic', 'minimal', 'puglia', 'cyber', 'none'];
+let currentFrameIndex = 0;
 let isFramed = true;
 let currentPhotoBlob;
 let currentPhotoDataUrl;
@@ -31,8 +33,13 @@ let animationId;
 let detector;
 let marker = null;
 let markerFoundPreviously = false;
+
 const logo = new Image();
 logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
+const logoEmblem = new Image();
+logoEmblem.src = './GraphicResources/Banners_&_logo/Logo.svg';
+const roosterImg = new Image();
+roosterImg.src = './GraphicResources/Website_materials/rooster.svg';
 
 const arOrb = document.querySelector('#ar-orb');
 const arMediaPreview = document.querySelector('#ar-media-preview');
@@ -46,12 +53,43 @@ const btnTogglePause = document.querySelector('#btn-toggle-pause');
 const arTransformBar = document.querySelector('#ar-transform-bar');
 const liveFrameOverlay = document.querySelector('#live-frame-overlay');
 const liveFrameWatermark = document.querySelector('#live-frame-watermark');
+const frameSwatch = document.querySelector('#frame-swatch');
+const frameToggleText = document.querySelector('#frame-toggle-text');
 
 function updateLiveFrame() {
+  const style = FRAME_STYLES[currentFrameIndex] || 'classic';
+  isFramed = style !== 'none';
+  const t = getT();
+
   if (liveFrameOverlay) {
-    liveFrameOverlay.classList.toggle('is-hidden', !isFramed);
+    liveFrameOverlay.classList.remove('frame-style-classic', 'frame-style-minimal', 'frame-style-puglia', 'frame-style-cyber');
+    if (isFramed) {
+      liveFrameOverlay.classList.remove('is-hidden');
+      liveFrameOverlay.classList.add(`frame-style-${style}`);
+    } else {
+      liveFrameOverlay.classList.add('is-hidden');
+    }
   }
+
   document.body.classList.toggle('frame-active', isFramed);
+
+  if (frameToggle) {
+    frameToggle.classList.toggle('is-active', isFramed);
+    frameToggle.setAttribute('aria-pressed', String(isFramed));
+  }
+
+  if (frameSwatch) {
+    frameSwatch.className = `frame-swatch swatch-${style}`;
+  }
+
+  if (frameToggleText) {
+    const labelKey = `frame${style.charAt(0).toUpperCase() + style.slice(1)}`;
+    frameToggleText.textContent = t[labelKey] || style;
+  }
+
+  if (liveFrameWatermark) {
+    liveFrameWatermark.textContent = t.watermark || 'XR venue experience · #ISMAR2026';
+  }
 }
 
 const btnResetTransform = document.querySelector('#btn-reset-transform');
@@ -283,6 +321,12 @@ function updateTranslations() {
     liveFrameWatermark.textContent = t.watermark || 'XR venue experience · #ISMAR2026';
   }
 
+  if (frameToggleText) {
+    const style = FRAME_STYLES[currentFrameIndex] || 'classic';
+    const labelKey = `frame${style.charAt(0).toUpperCase() + style.slice(1)}`;
+    frameToggleText.textContent = t[labelKey] || style;
+  }
+
   if (marker) {
     trackingText.textContent = t.trackingHintFound;
   } else {
@@ -494,8 +538,23 @@ function drawArCard(context, width, height, modelSnapshotImg = null) {
 }
 
 function drawFrame(context, width, height) {
+  const style = FRAME_STYLES[currentFrameIndex] || 'classic';
+  if (style === 'none') return;
+
+  if (style === 'classic') {
+    drawFrameClassic(context, width, height);
+  } else if (style === 'minimal') {
+    drawFrameMinimal(context, width, height);
+  } else if (style === 'puglia') {
+    drawFramePuglia(context, width, height);
+  } else if (style === 'cyber') {
+    drawFrameCyber(context, width, height);
+  }
+}
+
+function drawFrameClassic(context, width, height) {
   const t = getT();
-  const edge = Math.max(15, width * .027);
+  const edge = Math.max(14, width * .027);
   context.save();
   context.strokeStyle = '#ffe000';
   context.lineWidth = edge;
@@ -516,6 +575,187 @@ function drawFrame(context, width, height) {
   context.textAlign = 'right';
   context.font = `600 ${Math.max(13, width * .024)}px Poppins`;
   context.fillText(t.watermark || 'XR venue experience · #ISMAR2026', width - edge * 2.2, height - height * .045);
+  context.restore();
+}
+
+function drawFrameMinimal(context, width, height) {
+  const edge = Math.max(14, width * .035);
+  const bLen = Math.max(26, width * .075);
+  const bThick = Math.max(3.5, width * .007);
+  context.save();
+
+  // 4 corner brackets
+  context.strokeStyle = '#ffe000';
+  context.lineWidth = bThick;
+  context.lineCap = 'round';
+  context.lineJoin = 'round';
+
+  // Top-left
+  context.beginPath();
+  context.moveTo(edge, edge + bLen);
+  context.lineTo(edge, edge);
+  context.lineTo(edge + bLen, edge);
+  context.stroke();
+
+  // Top-right
+  context.beginPath();
+  context.moveTo(width - edge - bLen, edge);
+  context.lineTo(width - edge, edge);
+  context.lineTo(width - edge, edge + bLen);
+  context.stroke();
+
+  // Bottom-left
+  context.beginPath();
+  context.moveTo(edge, height - edge - bLen);
+  context.lineTo(edge, height - edge);
+  context.lineTo(edge + bLen, height - edge);
+  context.stroke();
+
+  // Bottom-right
+  context.beginPath();
+  context.moveTo(width - edge - bLen, height - edge);
+  context.lineTo(width - edge, height - edge);
+  context.lineTo(width - edge, height - edge - bLen);
+  context.stroke();
+
+  // Top-left badge pill
+  const pillW = Math.max(140, width * .34);
+  const pillH = Math.max(28, width * .065);
+  context.fillStyle = 'rgba(61, 18, 9, 0.88)';
+  roundRect(context, edge + 8, edge + 8, pillW, pillH, pillH / 2);
+  context.fill();
+  context.strokeStyle = '#ffe000';
+  context.lineWidth = 1.5;
+  context.stroke();
+
+  if (logoEmblem.complete && logoEmblem.naturalWidth) {
+    const iconH = pillH * 0.72;
+    const iconW = (iconH / logoEmblem.naturalHeight) * logoEmblem.naturalWidth;
+    context.drawImage(logoEmblem, edge + 14, edge + 8 + (pillH - iconH) / 2, iconW, iconH);
+  }
+
+  context.fillStyle = '#ffffff';
+  context.textAlign = 'left';
+  context.font = `700 ${Math.max(10, width * .021)}px Poppins`;
+  context.fillText('IEEE ISMAR 2026 · BARI', edge + 14 + pillH * 0.8, edge + 8 + pillH * 0.65);
+
+  // Bottom-right coordinate tag
+  context.textAlign = 'right';
+  context.fillStyle = '#ffe000';
+  context.font = `600 ${Math.max(10, width * .02)}px Poppins`;
+  context.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  context.shadowBlur = 4;
+  context.fillText('41.1171° N, 16.8719° E · XR VENUE', width - edge - 8, height - edge - 12);
+  context.restore();
+}
+
+function drawFramePuglia(context, width, height) {
+  context.save();
+  const stripeH = Math.max(5, height * 0.009);
+
+  // Top Mediterranean 4-color stripe
+  const segW = width / 4;
+  context.fillStyle = '#ea5454';
+  context.fillRect(0, 0, segW, stripeH);
+  context.fillStyle = '#ffaa00';
+  context.fillRect(segW, 0, segW, stripeH);
+  context.fillStyle = '#ffe000';
+  context.fillRect(segW * 2, 0, segW, stripeH);
+  context.fillStyle = '#008bf2';
+  context.fillRect(segW * 3, 0, segW, stripeH);
+
+  // Bottom warm terracotta banner
+  const barH = height * 0.12;
+  context.fillStyle = '#3d1209ee';
+  context.fillRect(0, height - barH, width, barH);
+  context.fillStyle = '#ffaa00';
+  context.fillRect(0, height - barH, width, 3);
+
+  // Rooster on the right
+  if (roosterImg.complete && roosterImg.naturalWidth) {
+    const rH = barH * 0.82;
+    const rW = (rH / roosterImg.naturalHeight) * roosterImg.naturalWidth;
+    context.drawImage(roosterImg, width - rW - width * 0.035, height - barH + (barH - rH) / 2, rW, rH);
+  }
+
+  // Text on the left
+  context.textAlign = 'left';
+  context.fillStyle = '#ffaa00';
+  context.font = `800 ${Math.max(9, width * .019)}px Poppins`;
+  context.fillText('WELCOME TO PUGLIA', width * 0.04, height - barH * 0.58);
+
+  context.fillStyle = '#ffffff';
+  context.font = `700 ${Math.max(14, width * .03)}px "Tsukimi Rounded", Poppins`;
+  context.fillText('ISMAR 2026 · BARI', width * 0.04, height - barH * 0.22);
+  context.restore();
+}
+
+function drawFrameCyber(context, width, height) {
+  const edge = Math.max(12, width * .028);
+  const bLen = Math.max(32, width * .085);
+  const bThick = Math.max(3, width * .006);
+  context.save();
+
+  // Cyber corner brackets with glow
+  context.strokeStyle = '#00e5ff';
+  context.shadowColor = 'rgba(0, 229, 255, 0.85)';
+  context.shadowBlur = 8;
+  context.lineWidth = bThick;
+
+  // TL
+  context.beginPath();
+  context.moveTo(edge, edge + bLen);
+  context.lineTo(edge, edge);
+  context.lineTo(edge + bLen, edge);
+  context.stroke();
+
+  // TR
+  context.beginPath();
+  context.moveTo(width - edge - bLen, edge);
+  context.lineTo(width - edge, edge);
+  context.lineTo(width - edge, edge + bLen);
+  context.stroke();
+
+  // BL
+  context.beginPath();
+  context.moveTo(edge, height - edge - bLen);
+  context.lineTo(edge, height - edge);
+  context.lineTo(edge + bLen, height - edge);
+  context.stroke();
+
+  // BR
+  context.beginPath();
+  context.moveTo(width - edge - bLen, height - edge);
+  context.lineTo(width - edge, height - edge);
+  context.lineTo(width - edge, height - edge - bLen);
+  context.stroke();
+
+  // Corner yellow tick dots
+  context.fillStyle = '#ffe000';
+  context.fillRect(edge - 2, edge - 2, 5, 5);
+  context.fillRect(width - edge - 3, edge - 2, 5, 5);
+  context.fillRect(edge - 2, height - edge - 3, 5, 5);
+  context.fillRect(width - edge - 3, height - edge - 3, 5, 5);
+
+  // Top HUD readout
+  context.font = `700 ${Math.max(10, width * .022)}px monospace`;
+  context.textAlign = 'left';
+  context.fillStyle = '#ff3344';
+  context.fillText('● AR TRACKING [ACTIVE]', edge + 14, edge + 22);
+
+  context.textAlign = 'right';
+  context.fillStyle = '#ffe000';
+  context.fillText('TARGET: ISMAR 2026', width - edge - 14, edge + 22);
+
+  // Bottom HUD readout
+  context.textAlign = 'left';
+  context.fillStyle = '#00e5ff';
+  context.font = `700 ${Math.max(9, width * .019)}px monospace`;
+  context.fillText('41°07\'01"N 16°52\'18"E // BARI', edge + 14, height - edge - 16);
+
+  context.textAlign = 'right';
+  context.fillStyle = '#ffe000';
+  context.fillText('XR-HUD v2.6 · #ISMAR2026', width - edge - 14, height - edge - 16);
   context.restore();
 }
 
@@ -740,9 +980,7 @@ switchCameraButton.addEventListener('click', () => {
   startCamera();
 });
 frameToggle.addEventListener('click', () => {
-  isFramed = !isFramed;
-  frameToggle.classList.toggle('is-active', isFramed);
-  frameToggle.setAttribute('aria-pressed', String(isFramed));
+  currentFrameIndex = (currentFrameIndex + 1) % FRAME_STYLES.length;
   updateLiveFrame();
 });
 captureButton.addEventListener('click', () => {
