@@ -45,7 +45,10 @@
               </div>
             </div>
           </div>
-          <button class="primary-button" id="start-button" type="button" data-i18n="startButton">Open camera</button>
+          <button class="primary-button start-cta-button" id="start-button" type="button">
+            <span class="btn-camera-icon">📸</span>
+            <span data-i18n="startButton">Open camera</span>
+          </button>
           <p class="privacy-note" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
         </div>
 
@@ -133,17 +136,47 @@
           </div>
         </div>
 
-        <div class="ar-transform-bar" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls">
-          <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
-          <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
-          <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
-          <span class="ar-tool-divider" aria-hidden="true"></span>
-          <button class="ar-tool-btn" id="btn-rot-left" type="button" aria-label="Rotate left" title="Rotate left 15°">↶</button>
-          <button class="ar-tool-btn" id="btn-rot-right" type="button" aria-label="Rotate right" title="Rotate right 15°">↷</button>
-          <button class="ar-tool-btn ar-tool-3d" id="btn-toggle-3d" type="button" aria-label="Toggle 3D tilt mode" title="3D Tilt Mode">3D</button>
-          <span class="ar-tool-divider" aria-hidden="true"></span>
-          <button class="ar-tool-btn ar-tool-pause" id="btn-toggle-pause" type="button" aria-label="Pause animation" title="Pause / Resume animation">⏸</button>
-          <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position, scale and rotation" title="Reset">↺</button>
+        <!-- Interactive Frame Selector Drawer -->
+        <div class="frame-drawer is-hidden" id="frame-drawer" role="radiogroup" aria-label="Select frame style">
+          <button class="frame-option is-active" data-style="classic" type="button" role="radio" aria-checked="true">
+            <span class="frame-swatch swatch-classic" aria-hidden="true"></span>
+            <span class="frame-opt-name" data-i18n="frameClassic">Classic</span>
+          </button>
+          <button class="frame-option" data-style="minimal" type="button" role="radio" aria-checked="false">
+            <span class="frame-swatch swatch-minimal" aria-hidden="true"></span>
+            <span class="frame-opt-name" data-i18n="frameMinimal">Minimal</span>
+          </button>
+          <button class="frame-option" data-style="puglia" type="button" role="radio" aria-checked="false">
+            <span class="frame-swatch swatch-puglia" aria-hidden="true"></span>
+            <span class="frame-opt-name" data-i18n="framePuglia">Puglia</span>
+          </button>
+          <button class="frame-option" data-style="cyber" type="button" role="radio" aria-checked="false">
+            <span class="frame-swatch swatch-cyber" aria-hidden="true"></span>
+            <span class="frame-opt-name" data-i18n="frameCyber">Cyber XR</span>
+          </button>
+          <button class="frame-option" data-style="none" type="button" role="radio" aria-checked="false">
+            <span class="frame-swatch swatch-none" aria-hidden="true"></span>
+            <span class="frame-opt-name" data-i18n="frameNone">No frame</span>
+          </button>
+        </div>
+
+        <div class="ar-tools-wrapper" id="ar-tools-wrapper">
+          <button class="btn-toggle-tools" id="btn-toggle-tools" type="button" aria-expanded="false" aria-label="Toggle transformation controls">
+            <span class="tools-icon">✨</span>
+            <span class="tools-label" id="tools-label" data-i18n="btnAdjustTools">Adjust</span>
+          </button>
+          <div class="ar-transform-bar is-collapsed" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls">
+            <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
+            <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
+            <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
+            <span class="ar-tool-divider" aria-hidden="true"></span>
+            <button class="ar-tool-btn" id="btn-rot-left" type="button" aria-label="Rotate left" title="Rotate left 15°">↶</button>
+            <button class="ar-tool-btn" id="btn-rot-right" type="button" aria-label="Rotate right" title="Rotate right 15°">↷</button>
+            <button class="ar-tool-btn ar-tool-3d" id="btn-toggle-3d" type="button" aria-label="Toggle 3D tilt mode" title="3D Tilt Mode">3D</button>
+            <span class="ar-tool-divider" aria-hidden="true"></span>
+            <button class="ar-tool-btn ar-tool-pause" id="btn-toggle-pause" type="button" aria-label="Pause animation" title="Pause / Resume animation">⏸</button>
+            <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position, scale and rotation" title="Reset">↺</button>
+          </div>
         </div>
 
         <nav class="camera-controls" aria-label="Camera controls">
@@ -173,12 +206,17 @@
         <img id="photo-result" alt="ISMAR 2026 AR Photo" />
         <div class="preview-actions">
           <button class="secondary-button" id="retake-button" type="button" data-i18n="retake">Retake</button>
-          <button class="primary-button" id="save-button" type="button" data-i18n="savePhoto">Save photo</button>
+          <button class="secondary-button action-download" id="download-button" type="button">
+            <span>💾</span> <span id="download-btn-text" data-i18n="downloadAction">Save</span>
+          </button>
+          <button class="primary-button action-share" id="share-button" type="button">
+            <span>📤</span> <span data-i18n="shareAction">Share</span>
+          </button>
         </div>
       </section>
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=13"></script>
+    <script type="module" src="./src/app.js?v=14"></script>
   </body>
 </html>

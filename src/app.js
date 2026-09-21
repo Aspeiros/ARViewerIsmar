@@ -13,7 +13,9 @@ const captureButton = document.querySelector('#capture-button');
 const photoPreview = document.querySelector('#photo-preview');
 const photoResult = document.querySelector('#photo-result');
 const retakeButton = document.querySelector('#retake-button');
-const saveButton = document.querySelector('#save-button');
+const downloadButton = document.querySelector('#download-button');
+const shareButton = document.querySelector('#share-button');
+const downloadBtnText = document.querySelector('#download-btn-text');
 const message = document.querySelector('#message');
 const trackingHint = document.querySelector('#tracking-hint');
 const trackingText = document.querySelector('#tracking-text');
@@ -21,6 +23,11 @@ const markerGuide = document.querySelector('#marker-guide');
 const arContent = document.querySelector('#ar-content');
 const resetMarker = document.querySelector('#reset-marker');
 const langBtns = document.querySelectorAll('.lang-btn');
+const btnToggleTools = document.querySelector('#btn-toggle-tools');
+const toolsLabel = document.querySelector('#tools-label');
+const arToolsWrapper = document.querySelector('#ar-tools-wrapper');
+const frameDrawer = document.querySelector('#frame-drawer');
+const frameOptions = document.querySelectorAll('.frame-option');
 
 let stream;
 let facingMode = 'environment';
@@ -33,6 +40,9 @@ let animationId;
 let detector;
 let marker = null;
 let markerFoundPreviously = false;
+let isPinned = false;
+let toolsExpanded = false;
+let frameDrawerOpen = false;
 
 const logo = new Image();
 logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
@@ -89,6 +99,14 @@ function updateLiveFrame() {
 
   if (liveFrameWatermark) {
     liveFrameWatermark.textContent = t.watermark || 'XR venue experience · #ISMAR2026';
+  }
+
+  if (frameOptions) {
+    frameOptions.forEach((opt) => {
+      const isSelected = opt.getAttribute('data-style') === style;
+      opt.classList.toggle('is-active', isSelected);
+      opt.setAttribute('aria-checked', String(isSelected));
+    });
   }
 }
 
@@ -307,8 +325,11 @@ function updateTranslations() {
     btnTogglePause.setAttribute('title', pauseTitle);
     btnTogglePause.setAttribute('aria-label', pauseTitle);
   }
-  if (saveButton) {
-    saveButton.textContent = (captureMode === 'gif') ? (t.saveGif || 'Save GIF') : (t.savePhoto || 'Save photo');
+  if (toolsLabel) {
+    toolsLabel.textContent = t.btnAdjustTools || 'Adjust';
+  }
+  if (downloadBtnText) {
+    downloadBtnText.textContent = (captureMode === 'gif') ? (t.saveGif || 'Save GIF') : (t.downloadAction || 'Save');
   }
 
   langBtns.forEach((btn) => {
@@ -327,7 +348,11 @@ function updateTranslations() {
     frameToggleText.textContent = t[labelKey] || style;
   }
 
-  if (marker) {
+  if (facingMode === 'user') {
+    trackingText.textContent = t.selfieModeHint || 'Selfie mode: pose with AR!';
+  } else if (isPinned) {
+    trackingText.textContent = t.trackingHintLocked || 'AR Locked · Move freely!';
+  } else if (marker) {
     trackingText.textContent = t.trackingHintFound;
   } else {
     trackingText.textContent = t.trackingHintLooking;
@@ -351,8 +376,35 @@ async function startCamera() {
     document.body.classList.add('camera-active');
     startScreen.hidden = true;
     cameraUi.hidden = false;
-    if (arTransformBar) arTransformBar.hidden = false;
+    if (arToolsWrapper) arToolsWrapper.hidden = false;
     updateLiveFrame();
+
+    if (facingMode === 'user') {
+      document.body.classList.add('selfie-mode');
+      isPinned = true;
+      arContent.hidden = false;
+      markerGuide.classList.add('is-hidden');
+      trackingHint.classList.add('is-selfie');
+      trackingHint.classList.remove('is-tracking', 'is-locked');
+      trackingText.textContent = t.selfieModeHint || 'Modalità Selfie: elemento pronto!';
+      baseAnchorX = window.innerWidth * 0.72;
+      baseAnchorY = window.innerHeight * 0.32;
+      baseAngle = 0;
+      applyArTransform();
+    } else {
+      document.body.classList.remove('selfie-mode');
+      trackingHint.classList.remove('is-selfie');
+      if (isPinned) {
+        trackingHint.classList.add('is-tracking', 'is-locked');
+        trackingText.textContent = t.trackingHintLocked || 'Elemento AR agganciato ✦';
+      } else {
+        markerGuide.classList.remove('is-hidden');
+        trackingHint.classList.remove('is-locked', 'is-tracking');
+        trackingText.textContent = t.trackingHintLooking;
+        arContent.hidden = true;
+      }
+    }
+
     setMessage(t.contentHint);
     initialiseDetector();
   } catch (error) {
@@ -391,19 +443,25 @@ async function scanForMarker() {
     return;
   }
   try {
+    if (facingMode === 'user') {
+      animationId = requestAnimationFrame(scanForMarker);
+      return;
+    }
+
     const codes = await detector.detect(camera);
     if (codes[0]?.cornerPoints?.length) {
       marker = codes[0].cornerPoints;
       positionContent(marker);
+      isPinned = true;
       arContent.hidden = false;
       markerGuide.classList.add('is-hidden');
-      trackingHint.classList.add('is-tracking');
-      trackingText.textContent = t.trackingHintFound;
+      trackingHint.classList.add('is-tracking', 'is-locked');
+      trackingText.textContent = t.trackingHintLocked || 'AR Locked · Move freely!';
       if (!markerFoundPreviously) {
         markerFoundPreviously = true;
         setMessage(t.photoSuccessHint, 4500);
       }
-    } else if (!marker) {
+    } else if (!isPinned && !marker) {
       arContent.hidden = true;
       markerFoundPreviously = false;
     }
@@ -834,7 +892,14 @@ async function startRecordingGif() {
     }
 
     let modelSnapshotImg = await getModelSnapshot();
-    offCtx.drawImage(camera, 0, 0, targetW, targetH);
+    if (facingMode === 'user') {
+      offCtx.save();
+      offCtx.scale(-1, 1);
+      offCtx.drawImage(camera, -targetW, 0, targetW, targetH);
+      offCtx.restore();
+    } else {
+      offCtx.drawImage(camera, 0, 0, targetW, targetH);
+    }
     drawArCard(offCtx, targetW, targetH, modelSnapshotImg);
     if (isFramed) drawFrame(offCtx, targetW, targetH);
 
@@ -919,7 +984,14 @@ async function capturePhoto() {
   canvas.width = width;
   canvas.height = height;
   const context = canvas.getContext('2d');
-  context.drawImage(camera, 0, 0, width, height);
+  if (facingMode === 'user') {
+    context.save();
+    context.scale(-1, 1);
+    context.drawImage(camera, -width, 0, width, height);
+    context.restore();
+  } else {
+    context.drawImage(camera, 0, 0, width, height);
+  }
 
   let modelSnapshotImg = await getModelSnapshot();
 
@@ -935,42 +1007,76 @@ async function capturePhoto() {
   photoPreview.hidden = false;
 }
 
-async function savePhoto() {
-  const t = getT();
-  if (captureMode === 'gif') {
-    if (!currentGifBlob) return;
-    const file = new File([currentGifBlob], 'ismar-2026-ar-animation.gif', { type: 'image/gif' });
-    try {
-      if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: t.shareTitle || 'ISMAR 2026 AR Animation' });
-        return;
-      }
-    } catch (error) {
-      if (error.name === 'AbortError') return;
+// Download action (Save directly to storage)
+if (downloadButton) {
+  downloadButton.addEventListener('click', () => {
+    const t = getT();
+    if (captureMode === 'gif') {
+      if (!currentGifBlob) return;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(currentGifBlob);
+      link.download = 'ismar-2026-ar-animation.gif';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } else {
+      if (!currentPhotoBlob) return;
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(currentPhotoBlob);
+      link.download = 'ismar-2026-ar-photo.jpg';
+      link.click();
+      URL.revokeObjectURL(link.href);
     }
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(currentGifBlob);
-    link.download = file.name;
-    link.click();
-    URL.revokeObjectURL(link.href);
-    return;
-  }
+    setMessage(t.savedNotification || 'Salvato!', 2500);
+  });
+}
 
-  if (!currentPhotoBlob) return;
-  const file = new File([currentPhotoBlob], 'ismar-2026-ar-photo.jpg', { type: 'image/jpeg' });
-  try {
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], title: t.shareTitle || 'ISMAR 2026 AR' });
-      return;
+// Share action (Web Share API with graceful fallback)
+if (shareButton) {
+  shareButton.addEventListener('click', async () => {
+    const t = getT();
+    try {
+      if (captureMode === 'gif') {
+        if (!currentGifBlob) return;
+        const file = new File([currentGifBlob], 'ismar-2026-ar-animation.gif', { type: 'image/gif' });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: t.shareTitle || 'ISMAR 2026 AR Animation',
+            text: '#ISMAR2026 XR venue experience',
+            url: window.location.href
+          });
+          return;
+        }
+      } else {
+        if (!currentPhotoBlob) return;
+        const file = new File([currentPhotoBlob], 'ismar-2026-ar-photo.jpg', { type: 'image/jpeg' });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: t.shareTitle || 'ISMAR 2026 AR',
+            text: '#ISMAR2026 XR venue experience',
+            url: window.location.href
+          });
+          return;
+        }
+      }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: t.shareTitle || 'ISMAR 2026 AR',
+          text: '#ISMAR2026 XR venue experience',
+          url: window.location.href
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        setMessage(t.linkCopied || 'Link copiato negli appunti!', 3000);
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.warn('Share error:', err);
+      }
     }
-  } catch (error) {
-    if (error.name === 'AbortError') return;
-  }
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(currentPhotoBlob);
-  link.download = file.name;
-  link.click();
-  URL.revokeObjectURL(link.href);
+  });
 }
 
 // Event Listeners
@@ -979,10 +1085,53 @@ switchCameraButton.addEventListener('click', () => {
   facingMode = facingMode === 'environment' ? 'user' : 'environment';
   startCamera();
 });
-frameToggle.addEventListener('click', () => {
-  currentFrameIndex = (currentFrameIndex + 1) % FRAME_STYLES.length;
-  updateLiveFrame();
+
+// Interactive Frame Selector Drawer Toggle
+if (frameToggle) {
+  frameToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    frameDrawerOpen = !frameDrawerOpen;
+    if (frameDrawer) {
+      frameDrawer.classList.toggle('is-hidden', !frameDrawerOpen);
+    }
+  });
+}
+
+if (frameOptions) {
+  frameOptions.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const style = btn.getAttribute('data-style');
+      const idx = FRAME_STYLES.indexOf(style);
+      if (idx !== -1) {
+        currentFrameIndex = idx;
+        updateLiveFrame();
+      }
+      frameDrawerOpen = false;
+      if (frameDrawer) frameDrawer.classList.add('is-hidden');
+    });
+  });
+}
+
+document.addEventListener('click', (e) => {
+  if (frameDrawerOpen && frameDrawer && !frameDrawer.contains(e.target) && !frameToggle?.contains(e.target)) {
+    frameDrawerOpen = false;
+    frameDrawer.classList.add('is-hidden');
+  }
 });
+
+// Collapsible AR Transformation Bar
+if (btnToggleTools) {
+  btnToggleTools.addEventListener('click', () => {
+    toolsExpanded = !toolsExpanded;
+    btnToggleTools.classList.toggle('is-expanded', toolsExpanded);
+    btnToggleTools.setAttribute('aria-expanded', String(toolsExpanded));
+    if (arTransformBar) {
+      arTransformBar.classList.toggle('is-collapsed', !toolsExpanded);
+    }
+  });
+}
+
 captureButton.addEventListener('click', () => {
   if (captureMode === 'gif') {
     if (isRecordingGif) {
@@ -994,6 +1143,7 @@ captureButton.addEventListener('click', () => {
     capturePhoto();
   }
 });
+
 retakeButton.addEventListener('click', () => {
   photoPreview.hidden = true;
   if (currentGifDataUrl) {
@@ -1002,7 +1152,6 @@ retakeButton.addEventListener('click', () => {
     currentGifBlob = null;
   }
 });
-saveButton.addEventListener('click', savePhoto);
 
 if (btnModePhoto) {
   btnModePhoto.addEventListener('click', () => {
@@ -1016,7 +1165,7 @@ if (btnModePhoto) {
     }
     captureButton.classList.remove('mode-is-gif');
     const t = getT();
-    if (saveButton) saveButton.textContent = t.savePhoto || 'Save photo';
+    if (downloadBtnText) downloadBtnText.textContent = t.downloadAction || 'Save';
   });
 }
 
@@ -1031,7 +1180,7 @@ if (btnModeGif) {
     }
     captureButton.classList.add('mode-is-gif');
     const t = getT();
-    if (saveButton) saveButton.textContent = t.saveGif || 'Save GIF';
+    if (downloadBtnText) downloadBtnText.textContent = t.saveGif || 'Save GIF';
     setMessage(t.modeGifHint || 'Modalità GIF 6s: tocca l\'otturatore per registrare', 3000);
   });
 }
@@ -1040,7 +1189,8 @@ resetMarker.addEventListener('click', () => {
   const t = getT();
   marker = null;
   markerFoundPreviously = false;
-  trackingHint.classList.remove('is-tracking');
+  isPinned = false;
+  trackingHint.classList.remove('is-tracking', 'is-locked', 'is-selfie');
   trackingText.textContent = t.trackingHintLooking;
   markerGuide.classList.remove('is-hidden');
   arContent.hidden = true;
