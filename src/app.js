@@ -379,37 +379,35 @@ async function startCamera() {
     if (arToolsWrapper) arToolsWrapper.hidden = false;
     updateLiveFrame();
 
+    // AR content is immediately active, centered, and pinned in the scene
+    isPinned = true;
+    arContent.hidden = false;
+    markerGuide.classList.add('is-hidden');
+
     if (facingMode === 'user') {
       document.body.classList.add('selfie-mode');
-      isPinned = true;
-      arContent.hidden = false;
-      markerGuide.classList.add('is-hidden');
       trackingHint.classList.add('is-selfie');
       trackingHint.classList.remove('is-tracking', 'is-locked');
       trackingText.textContent = t.selfieModeHint || 'Modalità Selfie: elemento pronto!';
       baseAnchorX = window.innerWidth * 0.72;
       baseAnchorY = window.innerHeight * 0.32;
-      baseAngle = 0;
-      applyArTransform();
     } else {
       document.body.classList.remove('selfie-mode');
       trackingHint.classList.remove('is-selfie');
-      if (isPinned) {
-        trackingHint.classList.add('is-tracking', 'is-locked');
-        trackingText.textContent = t.trackingHintLocked || 'Elemento AR agganciato ✦';
-      } else {
-        markerGuide.classList.remove('is-hidden');
-        trackingHint.classList.remove('is-locked', 'is-tracking');
-        trackingText.textContent = t.trackingHintLooking;
-        arContent.hidden = true;
-      }
+      trackingHint.classList.add('is-tracking', 'is-locked');
+      trackingText.textContent = t.trackingHintLocked || 'AR Pronto · Mettiti in posa!';
+      baseAnchorX = window.innerWidth / 2;
+      baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.38);
     }
+    baseAngle = 0;
+    applyArTransform();
 
-    setMessage(t.contentHint);
+    setMessage(t.contentHint || 'Esperienza AR attiva! Trascina per posizionare e scatta la foto.', 4000);
     initialiseDetector();
   } catch (error) {
     console.error(error);
     setMessage(t.cameraPermission);
+    throw error;
   }
 }
 
@@ -421,7 +419,6 @@ function stopCamera() {
 }
 
 function initialiseDetector() {
-  const t = getT();
   if ('BarcodeDetector' in window) {
     try {
       detector = new BarcodeDetector({ formats: ['qr_code'] });
@@ -432,8 +429,6 @@ function initialiseDetector() {
     }
   }
   detector = null;
-  showFallbackMarker();
-  setMessage(t.contentFallbackHint);
 }
 
 async function scanForMarker() {
@@ -451,19 +446,15 @@ async function scanForMarker() {
     const codes = await detector.detect(camera);
     if (codes[0]?.cornerPoints?.length) {
       marker = codes[0].cornerPoints;
-      positionContent(marker);
+      // If user hasn't manually moved the AR item, align with physical marker
+      if (userOffsetX === 0 && userOffsetY === 0) {
+        positionContent(marker);
+      }
       isPinned = true;
       arContent.hidden = false;
       markerGuide.classList.add('is-hidden');
       trackingHint.classList.add('is-tracking', 'is-locked');
-      trackingText.textContent = t.trackingHintLocked || 'AR Locked · Move freely!';
-      if (!markerFoundPreviously) {
-        markerFoundPreviously = true;
-        setMessage(t.photoSuccessHint, 4500);
-      }
-    } else if (!isPinned && !marker) {
-      arContent.hidden = true;
-      markerFoundPreviously = false;
+      trackingText.textContent = t.trackingHintLocked || 'AR Pronto · Mettiti in posa!';
     }
   } catch (error) {
     console.warn('Errore lettura marker', error);
@@ -1187,13 +1178,6 @@ if (btnModeGif) {
 
 resetMarker.addEventListener('click', () => {
   const t = getT();
-  marker = null;
-  markerFoundPreviously = false;
-  isPinned = false;
-  trackingHint.classList.remove('is-tracking', 'is-locked', 'is-selfie');
-  trackingText.textContent = t.trackingHintLooking;
-  markerGuide.classList.remove('is-hidden');
-  arContent.hidden = true;
   userOffsetX = 0;
   userOffsetY = 0;
   userScale = 1.0;
@@ -1219,9 +1203,20 @@ resetMarker.addEventListener('click', () => {
       if (typeof ar3dModel.play === 'function') ar3dModel.play();
     }
   }
+  if (facingMode === 'user') {
+    baseAnchorX = window.innerWidth * 0.72;
+    baseAnchorY = window.innerHeight * 0.32;
+  } else {
+    baseAnchorX = window.innerWidth / 2;
+    baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.38);
+  }
+  baseAngle = 0;
+  isPinned = true;
+  arContent.hidden = false;
+  markerGuide.classList.add('is-hidden');
   updateScaleDisplay();
   applyArTransform();
-  setMessage(t.pointAgainHint);
+  setMessage(t.pointAgainHint || 'Elemento AR riposizionato al centro.', 2500);
 });
 
 // Gestione Trascinamento AR & Rotazione Spaziale 3D (Touch & Mouse Drag)
@@ -1459,3 +1454,19 @@ langBtns.forEach((btn) => {
 // Initialize translations and live frame on load
 updateTranslations();
 updateLiveFrame();
+
+// Direct camera launch: auto-start if permissions already granted, or on 1-tap anywhere
+if (navigator.mediaDevices?.getUserMedia) {
+  startCamera().catch(() => {
+    // If browser requires an explicit user gesture (e.g. first visit),
+    // startScreen remains ready for a single tap anywhere to launch.
+  });
+}
+
+if (startScreen) {
+  startScreen.addEventListener('click', (e) => {
+    if (!e.target.closest('.lang-bar')) {
+      startCamera();
+    }
+  });
+}
