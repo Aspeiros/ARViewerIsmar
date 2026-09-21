@@ -23,23 +23,123 @@ button { font: inherit; cursor: pointer; }
   position: relative;
   z-index: 4;
   min-height: 100dvh;
-  padding: max(68px, calc(env(safe-area-inset-top) + 54px)) 24px max(20px, env(safe-area-inset-bottom));
+  padding: max(68px, calc(env(safe-area-inset-top) + 54px)) 24px max(24px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 20px;
+  align-items: center;
+  text-align: center;
   background: radial-gradient(circle at 90% 12%, #fff0b3 0 8%, transparent 31%), linear-gradient(145deg, #f7d3cb, var(--beige) 62%, #fff0b3);
   overflow: hidden;
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+}
+.start-screen.is-fading-out {
+  opacity: 0;
+  transform: scale(0.97);
+  pointer-events: none;
+  visibility: hidden;
 }
 
-.start-content {
+.loading-container {
   position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 20px;
-  max-width: 520px;
+  align-items: center;
+  gap: 16px;
+  max-width: 440px;
+  width: 100%;
+  margin: auto;
+}
+
+.loading-logo {
+  width: min(290px, 76vw);
+  height: auto;
+  filter: drop-shadow(0 6px 16px rgba(61, 18, 9, 0.12));
+}
+
+.loading-kicker {
+  letter-spacing: 0.18em;
+  font-size: 11.5px;
+  margin-top: -6px;
+}
+
+.progress-box {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 2px solid var(--brown);
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: 4px 4px 0 var(--brown);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(61, 18, 9, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(61, 18, 9, 0.18);
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  width: 15%;
+  background: linear-gradient(90deg, #ffaa00, #ffe000, #008bf2);
+  background-size: 200% 100%;
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: shimmerProgress 2s linear infinite;
+  box-shadow: 0 0 10px rgba(255, 224, 0, 0.6);
+}
+
+@keyframes shimmerProgress {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brown);
+}
+
+.progress-status {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.progress-percent {
+  font-variant-numeric: tabular-nums;
+  color: var(--blue);
+}
+
+.loading-cta-btn {
+  margin-top: 4px;
+  width: 100%;
+  max-width: 360px;
+  justify-content: center;
+}
+.loading-cta-btn.is-hidden {
+  display: none !important;
+}
+
+.loading-privacy {
+  text-align: center;
+  margin-top: 4px;
 }
 
 .start-bg-rooster {

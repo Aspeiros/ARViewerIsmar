@@ -29,27 +29,26 @@
           <button class="lang-btn" data-lang="ko" type="button" title="한국어" aria-label="한국어">🇰🇷</button>
         </nav>
 
-        <div class="start-content">
-          <img class="brand-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
-          <div class="start-copy">
-            <p class="eyebrow" data-i18n="eyebrow">AR·E YOU READY TO EXPLORE?</p>
-            <h1 data-i18n="startTitle">Discover what's <span class="ar-highlight">AR</span>ound you.</h1>
-            <div class="steps-guide">
-              <div class="step-item">
-                <span class="step-num">1</span>
-                <p data-i18n="startStep1">Tap <strong>"Open AR camera"</strong> below</p>
-              </div>
-              <div class="step-item">
-                <span class="step-num">2</span>
-                <p data-i18n="startStep2">Watch the <strong>AR experience come to life</strong> right in front of you!</p>
-              </div>
+        <div class="loading-container">
+          <img class="brand-logo loading-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+          <p class="eyebrow loading-kicker">IEEE ISMAR 2026 · BARI</p>
+
+          <div class="progress-box" id="progress-box">
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+            <div class="progress-info">
+              <span class="progress-status" id="progress-status" data-i18n="loadingStatus">Starting AR camera...</span>
+              <span class="progress-percent" id="progress-percent">15%</span>
             </div>
           </div>
-          <button class="primary-button start-cta-button" id="start-button" type="button">
+
+          <button class="primary-button start-cta-button loading-cta-btn is-hidden" id="start-button" type="button">
             <span class="btn-camera-icon">📸</span>
-            <span data-i18n="startButton">Open AR camera</span>
+            <span id="start-btn-text" data-i18n="startButton">Open AR camera</span>
           </button>
-          <p class="privacy-note" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
+
+          <p class="privacy-note loading-privacy" data-i18n="privacyNote">The camera stays on your device: no images are uploaded.</p>
         </div>
 
         <img class="start-bg-rooster" src="./GraphicResources/Website_materials/rooster.svg" alt="" aria-hidden="true" />
@@ -217,6 +216,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=15"></script>
+    <script type="module" src="./src/app.js?v=16"></script>
   </body>
 </html>

@@ -28,6 +28,22 @@ const toolsLabel = document.querySelector('#tools-label');
 const arToolsWrapper = document.querySelector('#ar-tools-wrapper');
 const frameDrawer = document.querySelector('#frame-drawer');
 const frameOptions = document.querySelectorAll('.frame-option');
+const progressBarFill = document.querySelector('#progress-bar-fill');
+const progressStatus = document.querySelector('#progress-status');
+const progressPercent = document.querySelector('#progress-percent');
+const startBtnText = document.querySelector('#start-btn-text');
+
+function setProgress(percent, text) {
+  if (progressBarFill) {
+    progressBarFill.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+  }
+  if (progressPercent) {
+    progressPercent.textContent = `${Math.round(percent)}%`;
+  }
+  if (text && progressStatus) {
+    progressStatus.textContent = text;
+  }
+}
 
 let stream;
 let facingMode = 'environment';
@@ -239,6 +255,7 @@ if (mediaParam) {
     mediaImage.crossOrigin = 'anonymous';
     mediaImage.onload = () => {
       mediaLoaded = true;
+      if (!stream) setProgress(25);
     };
     mediaImage.src = mediaParam;
 
@@ -255,6 +272,9 @@ if (mediaParam) {
       arMediaPreview.hidden = true;
       ar3dModel.hidden = false;
       ar3dModel.src = mediaParam;
+      ar3dModel.addEventListener('load', () => {
+        if (!stream) setProgress(28);
+      }, { once: true });
     }
   }
 }
@@ -351,11 +371,18 @@ function updateTranslations() {
   if (facingMode === 'user') {
     trackingText.textContent = t.selfieModeHint || 'Selfie mode: pose with AR!';
   } else if (isPinned) {
-    trackingText.textContent = t.trackingHintLocked || 'AR Locked · Move freely!';
+    trackingText.textContent = t.trackingHintLocked || 'AR Ready · Move & Pose!';
   } else if (marker) {
     trackingText.textContent = t.trackingHintFound;
   } else {
     trackingText.textContent = t.trackingHintLooking;
+  }
+
+  if (progressStatus && !stream) {
+    progressStatus.textContent = t.loadingStatus || 'Starting AR camera...';
+  }
+  if (startBtnText) {
+    startBtnText.textContent = t.startButton || 'Open AR camera';
   }
 }
 
@@ -363,18 +390,22 @@ async function startCamera() {
   const t = getT();
   if (!navigator.mediaDevices?.getUserMedia) {
     setMessage(t.cameraUnsupported);
+    setProgress(0, t.cameraUnsupported);
     return;
   }
   try {
+    setProgress(35, t.loadingStatus || 'Avvio fotocamera AR...');
     stopCamera();
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false
     });
+    setProgress(75, t.loadingStatus || 'Avvio fotocamera AR...');
     camera.srcObject = stream;
     await camera.play();
+    setProgress(100, t.loadingReady || 'Pronto!');
+
     document.body.classList.add('camera-active');
-    startScreen.hidden = true;
     cameraUi.hidden = false;
     if (arToolsWrapper) arToolsWrapper.hidden = false;
     updateLiveFrame();
@@ -402,11 +433,22 @@ async function startCamera() {
     baseAngle = 0;
     applyArTransform();
 
+    // Smooth fade out of the loading screen
+    if (startScreen) {
+      startScreen.classList.add('is-fading-out');
+      setTimeout(() => {
+        startScreen.hidden = true;
+      }, 400);
+    }
+
     setMessage(t.contentHint || 'Esperienza AR attiva! Trascina per posizionare e scatta la foto.', 4000);
     initialiseDetector();
   } catch (error) {
-    console.error(error);
-    setMessage(t.cameraPermission);
+    console.warn('Camera launch error / awaiting gesture:', error?.name || error);
+    setProgress(50, t.loadingTapHint || 'Tocca per avviare la fotocamera');
+    if (startButton) {
+      startButton.classList.remove('is-hidden');
+    }
     throw error;
   }
 }
