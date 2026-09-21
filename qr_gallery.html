@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISMAR 2026 · QR Code WebAR Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Tsukimi+Rounded:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brown: #3d1209;
+      --blue: #008bf2;
+      --yellow: #ffe000;
+      --orange: #ffaa00;
+      --beige: #f4e8d4;
+      font-family: Poppins, Arial, sans-serif;
+      color: var(--brown);
+      background: var(--beige);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 90% 10%, #fff0b3 0 10%, transparent 35%),
+                  linear-gradient(150deg, #f7d3cb 0%, var(--beige) 60%, #fff0b3 100%);
+      padding: 40px 20px 60px;
+    }
+    header {
+      max-width: 1100px;
+      margin: 0 auto 36px;
+      text-align: center;
+    }
+    .header-logo {
+      width: min(320px, 80vw);
+      height: auto;
+      margin-bottom: 16px;
+    }
+    .eyebrow {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    h1 {
+      font-family: "Tsukimi Rounded", Poppins, sans-serif;
+      font-size: clamp(28px, 5vw, 44px);
+      line-height: 1.15;
+      margin-bottom: 12px;
+    }
+    .intro {
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 15px;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 26px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid var(--brown);
+      border-radius: 22px;
+      padding: 24px 20px 20px;
+      box-shadow: 5px 6px 0 var(--brown);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 7px 10px 0 var(--brown);
+    }
+    .badge {
+      position: absolute;
+      top: -12px;
+      background: var(--yellow);
+      border: 1.5px solid var(--brown);
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge.model3d {
+      background: var(--blue);
+      color: white;
+    }
+    .qr-container {
+      width: 210px;
+      height: 210px;
+      background: white;
+      border: 1.5px solid #e0d0c0;
+      border-radius: 16px;
+      padding: 10px;
+      margin: 10px 0 16px;
+      display: grid;
+      place-items: center;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .qr-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-family: "Tsukimi Rounded", Poppins, sans-serif;
+    }
+    p.desc {
+      font-size: 13px;
+      line-height: 1.4;
+      opacity: 0.8;
+      margin-bottom: 16px;
+      flex-grow: 1;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+    }
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-test {
+      background: var(--yellow);
+      color: var(--brown);
+      border: 1.5px solid var(--brown);
+      box-shadow: 2px 2px 0 var(--brown);
+    }
+    .btn-test:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 var(--brown);
+    }
+    .btn-download {
+      background: #ffffff;
+      color: var(--brown);
+      border: 1.5px solid var(--brown);
+    }
+    .btn-download:hover {
+      background: #f7eee3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img class="header-logo" src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
+    <p class="eyebrow">IEEE ISMAR 2026 · BARI</p>
+    <h1>Catalogo QR Code WebAR</h1>
+    <p class="intro">
+      Inquadra i QR code con la fotocamera dello smartphone (o aprilo dall'app AR Viewer) per attivare all'istante le grafiche animate, il modello 3D e i contenuti ufficiali.
+    </p>
+  </header>
+
+  <main class="grid">
+    <!-- Welcome to Bari -->
+    <article class="card">
+      <span class="badge">Animazione</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_animations_Welcome_to_Bari.png" alt="QR Welcome to Bari" />
+      </div>
+      <h2>Welcome to Bari</h2>
+      <p class="desc">Animazione di benvenuto con skyline e colori ufficiali pugliesi.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/animations/Welcome_to_Bari.gif" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_Bari.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_Bari.svg" download>📐 SVG</a>
+      </div>
+    </article>
+
+    <!-- Welcome to ISMAR 2026 -->
+    <article class="card">
+      <span class="badge">Animazione</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_animations_Welcome_to_ISMAR_2026.png" alt="QR Welcome to ISMAR 2026" />
+      </div>
+      <h2>Welcome to ISMAR 2026</h2>
+      <p class="desc">Grafica ufficiale animata per l'apertura e i totem della conferenza.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/animations/Welcome_to_ISMAR_2026.gif" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_ISMAR_2026.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_ISMAR_2026.svg" download>📐 SVG</a>
+      </div>
+    </article>
+
+    <!-- Welcome to Nicholaus Hotel -->
+    <article class="card">
+      <span class="badge">Animazione</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_animations_Welcome_to_Nicholaus_Hotel.png" alt="QR Welcome to Nicholaus Hotel" />
+      </div>
+      <h2>Nicolaus Hotel (Venue)</h2>
+      <p class="desc">Benvenuto presso la sede congressuale The Nicolaus Hotel Bari.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/animations/Welcome_to_Nicholaus_Hotel.gif" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_Nicholaus_Hotel.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Welcome_to_Nicholaus_Hotel.svg" download>📐 SVG</a>
+      </div>
+    </article>
+
+    <!-- Taste Puglia -->
+    <article class="card">
+      <span class="badge">Animazione</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_animations_Taste_Puglia.png" alt="QR Taste Puglia" />
+      </div>
+      <h2>Taste Puglia</h2>
+      <p class="desc">Esperienza AR dedicata alle specialità e sapori della Puglia.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/animations/Taste_Puglia.gif" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Taste_Puglia.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_animations_Taste_Puglia.svg" download>📐 SVG</a>
+      </div>
+    </article>
+
+    <!-- Logo ISMAR Animato -->
+    <article class="card">
+      <span class="badge">Animazione</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_images_Logo_Animated.png" alt="QR Logo Animated" />
+      </div>
+      <h2>Logo ISMAR Animato</h2>
+      <p class="desc">Logo fluttuante a tutto schermo senza cornice card.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/images/Logo_Animated.gif" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_images_Logo_Animated.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_images_Logo_Animated.svg" download>📐 SVG</a>
+      </div>
+    </article>
+
+    <!-- Logo 3D Interattivo -->
+    <article class="card">
+      <span class="badge model3d">3D Model</span>
+      <div class="qr-container">
+        <img src="./media/qrcodes/qr_3d_models_ISMAR_3D_Logo.png" alt="QR 3D Logo" />
+      </div>
+      <h2>Logo 3D Interattivo</h2>
+      <p class="desc">Modello 3D GLB con luci dinamiche, rotazione 360° e ombre reali.</p>
+      <div class="actions">
+        <a class="btn btn-test" href="./index.html?media=media/3d_models/ISMAR_3D_Logo.glb" target="_blank">🚀 Prova AR</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_3d_models_ISMAR_3D_Logo.png" download>💾 PNG</a>
+        <a class="btn btn-download" href="./media/qrcodes/qr_3d_models_ISMAR_3D_Logo.svg" download>📐 SVG</a>
+      </div>
+    </article>
+  </main>
+</body>
+</html>
