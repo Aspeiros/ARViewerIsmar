@@ -141,7 +141,11 @@ let gifRecordFrames = [];
 let currentGifBlob = null;
 let currentGifDataUrl = null;
 
+let isGifLoading = false;
+
 async function loadGifFrames(url) {
+  if (isGifLoading || decodedGifFrames.length > 0) return;
+  isGifLoading = true;
   try {
     const res = await fetch(url);
     const buf = await res.arrayBuffer();
@@ -175,6 +179,8 @@ async function loadGifFrames(url) {
     gifStartTime = performance.now();
   } catch (err) {
     console.warn('Impossibile decodificare i singoli frame GIF:', err);
+  } finally {
+    isGifLoading = false;
   }
 }
 
@@ -219,12 +225,14 @@ if (mediaParam) {
   mediaImage.crossOrigin = 'anonymous';
   mediaImage.onload = () => {
     mediaLoaded = true;
-    if (!stream) setProgress(25);
   };
   mediaImage.src = mediaParam;
 
   if (ext === 'gif') {
-    loadGifFrames(mediaParam);
+    // Schedule background frame decoding without blocking camera initialization
+    setTimeout(() => {
+      loadGifFrames(mediaParam);
+    }, 1800);
   }
 }
 
@@ -335,23 +343,61 @@ function updateTranslations() {
   }
 }
 
-async function startCamera() {
+let isStartingCamera = false;
+
+async function startCamera(fromUserGesture = false) {
+  if (stream) return;
+  if (isStartingCamera && !fromUserGesture) return;
+  isStartingCamera = true;
   const t = getT();
+
   if (!navigator.mediaDevices?.getUserMedia) {
     setMessage(t.cameraUnsupported);
     setProgress(0, t.cameraUnsupported);
+    isStartingCamera = false;
     return;
   }
+
   try {
     setProgress(35, t.loadingStatus || 'Avvio fotocamera AR...');
     stopCamera();
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+
+    // Setup video element attributes required for iOS Safari & Android inline autoplay
+    camera.muted = true;
+    camera.playsInline = true;
+    camera.setAttribute('playsinline', '');
+    camera.setAttribute('webkit-playsinline', '');
+
+    // Robust camera constraints compatible with all mobile cameras
+    const constraints = {
+      video: {
+        facingMode: { ideal: facingMode },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
       audio: false
-    });
+    };
+
+    const streamPromise = navigator.mediaDevices.getUserMedia(constraints);
+    if (!fromUserGesture) {
+      // If auto-starting on page load, timeout in 1.8s so we never stay stuck on "Starting AR camera"
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AutoStartTimeout')), 1800)
+      );
+      stream = await Promise.race([streamPromise, timeoutPromise]);
+    } else {
+      stream = await streamPromise;
+    }
+
     setProgress(75, t.loadingStatus || 'Avvio fotocamera AR...');
     camera.srcObject = stream;
-    await camera.play();
+
+    try {
+      await camera.play();
+    } catch (playErr) {
+      console.warn('camera.play() error / awaiting user gesture:', playErr);
+    }
+
     setProgress(100, t.loadingReady || 'Pronto!');
 
     document.body.classList.add('camera-active');
@@ -392,12 +438,13 @@ async function startCamera() {
     setMessage(t.contentHint || 'Esperienza AR attiva! Trascina per posizionare e scatta la foto.', 4000);
     initialiseDetector();
   } catch (error) {
-    console.warn('Camera launch error / awaiting gesture:', error?.name || error);
+    console.warn('Camera launch waiting for user gesture or permission:', error?.name || error);
     setProgress(50, t.loadingTapHint || 'Tocca per avviare la fotocamera');
     if (startButton) {
       startButton.classList.remove('is-hidden');
     }
-    throw error;
+  } finally {
+    isStartingCamera = false;
   }
 }
 
@@ -1020,10 +1067,13 @@ if (shareButton) {
 }
 
 // Event Listeners
-startButton.addEventListener('click', startCamera);
+startButton.addEventListener('click', (e) => {
+  e.stopPropagation();
+  startCamera(true);
+});
 switchCameraButton.addEventListener('click', () => {
   facingMode = facingMode === 'environment' ? 'user' : 'environment';
-  startCamera();
+  startCamera(true);
 });
 
 // Interactive Frame Selector Drawer Toggle
@@ -1258,18 +1308,18 @@ langBtns.forEach((btn) => {
 updateTranslations();
 updateLiveFrame();
 
-// Direct camera launch: auto-start if permissions already granted, or on 1-tap anywhere
+// Direct camera launch: auto-start if permissions already granted on this device
 if (navigator.mediaDevices?.getUserMedia) {
-  startCamera().catch(() => {
+  startCamera(false).catch(() => {
     // If browser requires an explicit user gesture (e.g. first visit),
-    // startScreen remains ready for a single tap anywhere to launch.
+    // startScreen and startButton remain ready for an instant tap to launch.
   });
 }
 
 if (startScreen) {
   startScreen.addEventListener('click', (e) => {
     if (!e.target.closest('.lang-bar')) {
-      startCamera();
+      startCamera(true);
     }
   });
 }
