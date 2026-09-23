@@ -23,11 +23,6 @@ const markerGuide = document.querySelector('#marker-guide');
 const arContent = document.querySelector('#ar-content');
 const resetMarker = document.querySelector('#reset-marker');
 const langBtns = document.querySelectorAll('.lang-btn');
-const btnToggleTools = document.querySelector('#btn-toggle-tools');
-const toolsLabel = document.querySelector('#tools-label');
-const arToolsWrapper = document.querySelector('#ar-tools-wrapper');
-const frameDrawer = document.querySelector('#frame-drawer');
-const frameOptions = document.querySelectorAll('.frame-option');
 const progressBarFill = document.querySelector('#progress-bar-fill');
 const progressStatus = document.querySelector('#progress-status');
 const progressPercent = document.querySelector('#progress-percent');
@@ -57,8 +52,6 @@ let detector;
 let marker = null;
 let markerFoundPreviously = false;
 let isPinned = false;
-let toolsExpanded = false;
-let frameDrawerOpen = false;
 
 const logo = new Image();
 logo.src = './GraphicResources/Banners_&_logo/Logo_&_wordmark.svg';
@@ -67,16 +60,8 @@ logoEmblem.src = './GraphicResources/Banners_&_logo/Logo.svg';
 const roosterImg = new Image();
 roosterImg.src = './GraphicResources/Website_materials/rooster.svg';
 
-const arOrb = document.querySelector('#ar-orb');
 const arMediaPreview = document.querySelector('#ar-media-preview');
-const ar3dModel = document.querySelector('#ar-3d-model');
-const btnZoomIn = document.querySelector('#btn-zoom-in');
-const btnZoomOut = document.querySelector('#btn-zoom-out');
-const btnRotLeft = document.querySelector('#btn-rot-left');
-const btnRotRight = document.querySelector('#btn-rot-right');
-const btnToggle3d = document.querySelector('#btn-toggle-3d');
 const btnTogglePause = document.querySelector('#btn-toggle-pause');
-const arTransformBar = document.querySelector('#ar-transform-bar');
 const liveFrameOverlay = document.querySelector('#live-frame-overlay');
 const liveFrameWatermark = document.querySelector('#live-frame-watermark');
 const frameSwatch = document.querySelector('#frame-swatch');
@@ -116,18 +101,7 @@ function updateLiveFrame() {
   if (liveFrameWatermark) {
     liveFrameWatermark.textContent = t.watermark || 'XR venue experience · #ISMAR2026';
   }
-
-  if (frameOptions) {
-    frameOptions.forEach((opt) => {
-      const isSelected = opt.getAttribute('data-style') === style;
-      opt.classList.toggle('is-active', isSelected);
-      opt.setAttribute('aria-checked', String(isSelected));
-    });
-  }
 }
-
-const btnResetTransform = document.querySelector('#btn-reset-transform');
-const arScaleBadge = document.querySelector('#ar-scale-badge');
 
 const btnModePhoto = document.querySelector('#btn-mode-photo');
 const btnModeGif = document.querySelector('#btn-mode-gif');
@@ -136,7 +110,8 @@ const shutterRingProgress = document.querySelector('#shutter-ring-progress');
 
 const params = new URLSearchParams(window.location.search);
 const contentKey = params.get('content') || 'welcome';
-const mediaParam = params.get('media');
+const DEFAULT_MEDIA = './media/images/Logo_Animated.gif';
+const mediaParam = params.get('media') || DEFAULT_MEDIA;
 
 let userOffsetX = 0;
 let userOffsetY = 0;
@@ -144,10 +119,8 @@ let userScale = 1.0;
 let userRotateZ = 0;
 let userRotateX = 0;
 let userRotateY = 0;
-let is3dMode = false;
-let is3dModel = false;
 let baseAnchorX = window.innerWidth / 2;
-let baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.35);
+let baseAnchorY = window.innerHeight * 0.46;
 let baseAngle = 0;
 
 let mediaImage = null;
@@ -223,59 +196,35 @@ function getCurrentGifFrame() {
   return decodedGifFrames[0];
 }
 
-function updateScaleDisplay() {
-  if (arScaleBadge) {
-    arScaleBadge.textContent = `${Math.round(userScale * 100)}%`;
-  }
-}
-
 function applyArTransform() {
   const posX = baseAnchorX + userOffsetX;
   const posY = baseAnchorY + userOffsetY;
   arContent.style.left = `${posX}px`;
   arContent.style.top = `${posY}px`;
 
-  const translatePart = (mediaParam || is3dModel) ? 'translate(-50%, -50%)' : 'translate(-50%, -100%)';
   const totalAngleZ = baseAngle + userRotateZ;
-  arContent.style.transform = `${translatePart} perspective(1000px) rotateX(${userRotateX}deg) rotateY(${userRotateY}deg) rotateZ(${totalAngleZ}deg) scale(${userScale})`;
+  arContent.style.transform = `translate(-50%, -50%) rotateZ(${totalAngleZ}deg) scale(${userScale})`;
 }
 
 if (mediaParam) {
   const ext = mediaParam.split('.').pop().toLowerCase();
-  if (['gif', 'png', 'jpg', 'jpeg', 'webp', 'svg'].includes(ext)) {
-    if (arContent) {
-      arContent.classList.add('is-media-only');
-    }
-    if (arOrb && arMediaPreview) {
-      arOrb.hidden = true;
-      arMediaPreview.hidden = false;
-      arMediaPreview.src = mediaParam;
-    }
-    mediaImage = new Image();
-    mediaImage.crossOrigin = 'anonymous';
-    mediaImage.onload = () => {
-      mediaLoaded = true;
-      if (!stream) setProgress(25);
-    };
-    mediaImage.src = mediaParam;
+  if (arContent) {
+    arContent.classList.add('is-media-only');
+  }
+  if (arMediaPreview) {
+    arMediaPreview.hidden = false;
+    arMediaPreview.src = mediaParam;
+  }
+  mediaImage = new Image();
+  mediaImage.crossOrigin = 'anonymous';
+  mediaImage.onload = () => {
+    mediaLoaded = true;
+    if (!stream) setProgress(25);
+  };
+  mediaImage.src = mediaParam;
 
-    if (ext === 'gif') {
-      loadGifFrames(mediaParam);
-    }
-  } else if (['glb', 'gltf'].includes(ext)) {
-    is3dModel = true;
-    if (arContent) {
-      arContent.classList.add('is-media-only');
-    }
-    if (arOrb && arMediaPreview && ar3dModel) {
-      arOrb.hidden = true;
-      arMediaPreview.hidden = true;
-      ar3dModel.hidden = false;
-      ar3dModel.src = mediaParam;
-      ar3dModel.addEventListener('load', () => {
-        if (!stream) setProgress(28);
-      }, { once: true });
-    }
+  if (ext === 'gif') {
+    loadGifFrames(mediaParam);
   }
 }
 
@@ -407,7 +356,6 @@ async function startCamera() {
 
     document.body.classList.add('camera-active');
     cameraUi.hidden = false;
-    if (arToolsWrapper) arToolsWrapper.hidden = false;
     updateLiveFrame();
 
     // AR content is immediately active, centered, and pinned in the scene
@@ -428,7 +376,7 @@ async function startCamera() {
       trackingHint.classList.add('is-tracking', 'is-locked');
       trackingText.textContent = t.trackingHintLocked || 'AR Pronto · Mettiti in posa!';
       baseAnchorX = window.innerWidth / 2;
-      baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.38);
+      baseAnchorY = window.innerHeight * 0.46;
     }
     baseAngle = 0;
     applyArTransform();
@@ -527,13 +475,13 @@ function showFallbackMarker() {
   marker = null;
   arContent.hidden = false;
   baseAnchorX = window.innerWidth / 2;
-  baseAnchorY = window.innerHeight * ((mediaParam || is3dModel) ? 0.46 : 0.35);
+  baseAnchorY = window.innerHeight * 0.46;
   baseAngle = 0;
   applyArTransform();
   markerGuide.classList.remove('is-hidden');
 }
 
-function drawArCard(context, width, height, modelSnapshotImg = null) {
+function drawArCard(context, width, height) {
   const rect = camera.getBoundingClientRect();
   const screenW = rect.width || window.innerWidth;
   const screenH = rect.height || window.innerHeight;
@@ -544,23 +492,6 @@ function drawArCard(context, width, height, modelSnapshotImg = null) {
   const totalAngleZ = baseAngle + userRotateZ;
   const scale = Math.min(width / 390, height / 844) * userScale;
 
-  const tiltScaleX = Math.cos((userRotateY * Math.PI) / 180);
-  const tiltScaleY = Math.cos((userRotateX * Math.PI) / 180);
-
-  if (is3dModel && modelSnapshotImg && modelSnapshotImg.naturalWidth) {
-    const mediaSize = Math.min(width * 0.78, height * 0.52) * userScale;
-    context.save();
-    context.translate(canvasTargetX, canvasTargetY);
-    context.rotate((totalAngleZ * Math.PI) / 180);
-    context.scale(tiltScaleX, tiltScaleY);
-    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    context.shadowBlur = 32 * scale;
-    context.shadowOffsetY = 16 * scale;
-    context.drawImage(modelSnapshotImg, -mediaSize / 2, -mediaSize / 2, mediaSize, mediaSize);
-    context.restore();
-    return;
-  }
-
   if (mediaParam && mediaLoaded) {
     const activeFrame = getCurrentGifFrame();
     const sourceDrawable = activeFrame ? activeFrame.canvas : (mediaImage?.complete && mediaImage?.naturalWidth ? mediaImage : null);
@@ -569,7 +500,6 @@ function drawArCard(context, width, height, modelSnapshotImg = null) {
       context.save();
       context.translate(canvasTargetX, canvasTargetY);
       context.rotate((totalAngleZ * Math.PI) / 180);
-      context.scale(tiltScaleX, tiltScaleY);
       context.shadowColor = 'rgba(0, 0, 0, 0.5)';
       context.shadowBlur = 32 * scale;
       context.shadowOffsetY = 16 * scale;
@@ -858,26 +788,6 @@ function roundRect(context, x, y, width, height, radius) {
 
 let originalGifSrc = null;
 
-async function getModelSnapshot() {
-  if (is3dModel && ar3dModel && !ar3dModel.hidden && typeof ar3dModel.toDataURL === 'function') {
-    try {
-      const modelUrl = await ar3dModel.toDataURL('image/png');
-      if (modelUrl) {
-        const img = new Image();
-        await new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve;
-          img.src = modelUrl;
-        });
-        return img;
-      }
-    } catch (e) {
-      console.warn('Could not capture model-viewer snapshot', e);
-    }
-  }
-  return null;
-}
-
 const GIF_DURATION_MS = 6000;
 const GIF_INTERVAL_MS = 140; // ~7 fps -> ~42 frames
 
@@ -924,7 +834,6 @@ async function startRecordingGif() {
       shutterRingProgress.style.strokeDashoffset = (207.34 * (1 - progress)).toString();
     }
 
-    let modelSnapshotImg = await getModelSnapshot();
     if (facingMode === 'user') {
       offCtx.save();
       offCtx.scale(-1, 1);
@@ -933,7 +842,7 @@ async function startRecordingGif() {
     } else {
       offCtx.drawImage(camera, 0, 0, targetW, targetH);
     }
-    drawArCard(offCtx, targetW, targetH, modelSnapshotImg);
+    drawArCard(offCtx, targetW, targetH);
     if (isFramed) drawFrame(offCtx, targetW, targetH);
 
     const imgData = offCtx.getImageData(0, 0, targetW, targetH);
@@ -1026,9 +935,7 @@ async function capturePhoto() {
     context.drawImage(camera, 0, 0, width, height);
   }
 
-  let modelSnapshotImg = await getModelSnapshot();
-
-  drawArCard(context, width, height, modelSnapshotImg);
+  drawArCard(context, width, height);
   if (isFramed) drawFrame(context, width, height);
 
   currentPhotoDataUrl = canvas.toDataURL('image/jpeg', .92);
@@ -1120,48 +1027,12 @@ switchCameraButton.addEventListener('click', () => {
 });
 
 // Interactive Frame Selector Drawer Toggle
+// Direct 1-tap Frame Cycling
 if (frameToggle) {
   frameToggle.addEventListener('click', (e) => {
     e.stopPropagation();
-    frameDrawerOpen = !frameDrawerOpen;
-    if (frameDrawer) {
-      frameDrawer.classList.toggle('is-hidden', !frameDrawerOpen);
-    }
-  });
-}
-
-if (frameOptions) {
-  frameOptions.forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const style = btn.getAttribute('data-style');
-      const idx = FRAME_STYLES.indexOf(style);
-      if (idx !== -1) {
-        currentFrameIndex = idx;
-        updateLiveFrame();
-      }
-      frameDrawerOpen = false;
-      if (frameDrawer) frameDrawer.classList.add('is-hidden');
-    });
-  });
-}
-
-document.addEventListener('click', (e) => {
-  if (frameDrawerOpen && frameDrawer && !frameDrawer.contains(e.target) && !frameToggle?.contains(e.target)) {
-    frameDrawerOpen = false;
-    frameDrawer.classList.add('is-hidden');
-  }
-});
-
-// Collapsible AR Transformation Bar
-if (btnToggleTools) {
-  btnToggleTools.addEventListener('click', () => {
-    toolsExpanded = !toolsExpanded;
-    btnToggleTools.classList.toggle('is-expanded', toolsExpanded);
-    btnToggleTools.setAttribute('aria-expanded', String(toolsExpanded));
-    if (arTransformBar) {
-      arTransformBar.classList.toggle('is-collapsed', !toolsExpanded);
-    }
+    currentFrameIndex = (currentFrameIndex + 1) % FRAME_STYLES.length;
+    updateLiveFrame();
   });
 }
 
@@ -1226,11 +1097,6 @@ resetMarker.addEventListener('click', () => {
   userRotateZ = 0;
   userRotateX = 0;
   userRotateY = 0;
-  is3dMode = false;
-  if (btnToggle3d) {
-    btnToggle3d.classList.remove('is-active');
-    btnToggle3d.setAttribute('aria-pressed', 'false');
-  }
   if (isPaused) {
     isPaused = false;
     if (btnTogglePause) {
@@ -1240,32 +1106,26 @@ resetMarker.addEventListener('click', () => {
     }
     if (arContent) arContent.classList.remove('is-paused');
     if (originalGifSrc && arMediaPreview) arMediaPreview.src = originalGifSrc;
-    if (is3dModel && ar3dModel) {
-      ar3dModel.setAttribute('auto-rotate', '');
-      if (typeof ar3dModel.play === 'function') ar3dModel.play();
-    }
   }
   if (facingMode === 'user') {
     baseAnchorX = window.innerWidth * 0.72;
     baseAnchorY = window.innerHeight * 0.32;
   } else {
     baseAnchorX = window.innerWidth / 2;
-    baseAnchorY = window.innerHeight * (mediaParam ? 0.46 : 0.38);
+    baseAnchorY = window.innerHeight * 0.46;
   }
   baseAngle = 0;
   isPinned = true;
   arContent.hidden = false;
   markerGuide.classList.add('is-hidden');
-  updateScaleDisplay();
   applyArTransform();
   setMessage(t.pointAgainHint || 'Elemento AR riposizionato al centro.', 2500);
 });
 
-// Gestione Trascinamento AR & Rotazione Spaziale 3D (Touch & Mouse Drag)
+// Gestione Trascinamento AR (Touch & Mouse Drag)
 let isDragging = false;
 let startPointerX = 0, startPointerY = 0;
 let origOffsetX = 0, origOffsetY = 0;
-let origRotateX = 0, origRotateY = 0;
 
 arContent.addEventListener('pointerdown', (e) => {
   isDragging = true;
@@ -1273,8 +1133,6 @@ arContent.addEventListener('pointerdown', (e) => {
   startPointerY = e.clientY;
   origOffsetX = userOffsetX;
   origOffsetY = userOffsetY;
-  origRotateX = userRotateX;
-  origRotateY = userRotateY;
   arContent.classList.add('is-dragging');
   arContent.setPointerCapture(e.pointerId);
 });
@@ -1283,16 +1141,8 @@ arContent.addEventListener('pointermove', (e) => {
   if (!isDragging) return;
   const dx = e.clientX - startPointerX;
   const dy = e.clientY - startPointerY;
-
-  if (is3dMode) {
-    // Modalità 3D: orientamento su asse Y (yaw orizzontale) e asse X (pitch verticale)
-    userRotateY = Math.max(-85, Math.min(85, origRotateY + dx * 0.45));
-    userRotateX = Math.max(-85, Math.min(85, origRotateX - dy * 0.45));
-  } else {
-    // Normale traslazione 2D
-    userOffsetX = origOffsetX + dx;
-    userOffsetY = origOffsetY + dy;
-  }
+  userOffsetX = origOffsetX + dx;
+  userOffsetY = origOffsetY + dy;
   applyArTransform();
 });
 
@@ -1332,7 +1182,6 @@ window.addEventListener('touchmove', (e) => {
     const currentDist = Math.hypot(p1.clientX - p2.clientX, p1.clientY - p2.clientY);
     const factor = currentDist / initialPinchDist;
     userScale = Math.min(3.5, Math.max(0.3, initialPinchScale * factor));
-    updateScaleDisplay();
 
     const currentAngle = Math.atan2(p2.clientY - p1.clientY, p2.clientX - p1.clientX) * (180 / Math.PI);
     const angleDiff = currentAngle - initialTwistAngle;
@@ -1353,54 +1202,8 @@ arContent.addEventListener('wheel', (e) => {
   e.preventDefault();
   const delta = e.deltaY < 0 ? 0.12 : -0.12;
   userScale = Math.min(3.5, Math.max(0.3, userScale + delta));
-  updateScaleDisplay();
   applyArTransform();
 }, { passive: false });
-
-// Controlli Zoom, Rotazione e Modalità 3D
-if (btnZoomIn) {
-  btnZoomIn.addEventListener('click', () => {
-    userScale = Math.min(3.5, userScale + 0.15);
-    updateScaleDisplay();
-    applyArTransform();
-  });
-}
-
-if (btnZoomOut) {
-  btnZoomOut.addEventListener('click', () => {
-    userScale = Math.max(0.3, userScale - 0.15);
-    updateScaleDisplay();
-    applyArTransform();
-  });
-}
-
-if (btnRotLeft) {
-  btnRotLeft.addEventListener('click', () => {
-    userRotateZ = (userRotateZ - 15) % 360;
-    applyArTransform();
-  });
-}
-
-if (btnRotRight) {
-  btnRotRight.addEventListener('click', () => {
-    userRotateZ = (userRotateZ + 15) % 360;
-    applyArTransform();
-  });
-}
-
-if (btnToggle3d) {
-  btnToggle3d.addEventListener('click', () => {
-    is3dMode = !is3dMode;
-    btnToggle3d.classList.toggle('is-active', is3dMode);
-    btnToggle3d.setAttribute('aria-pressed', String(is3dMode));
-    const t = getT();
-    if (is3dMode) {
-      setMessage(t.ar3dModeActive || 'Modalità 3D attiva: trascina per inclinare e ruotare nello spazio', 3500);
-    } else {
-      setMessage(t.arMoveHint || 'Trascina per spostare · Pizzica o usa i tasti per ruotare e ridimensionare', 3500);
-    }
-  });
-}
 
 if (btnTogglePause) {
   btnTogglePause.addEventListener('click', () => {
@@ -1432,50 +1235,8 @@ if (btnTogglePause) {
       }
     }
 
-    if (is3dModel && ar3dModel) {
-      if (isPaused) {
-        ar3dModel.removeAttribute('auto-rotate');
-        if (typeof ar3dModel.pause === 'function') ar3dModel.pause();
-      } else {
-        ar3dModel.setAttribute('auto-rotate', '');
-        if (typeof ar3dModel.play === 'function') ar3dModel.play();
-      }
-    }
-
     const msg = isPaused ? (t.animPaused || 'Animazione in pausa') : (t.animResumed || 'Animazione ripresa');
     setMessage(msg, 2000);
-  });
-}
-
-if (btnResetTransform) {
-  btnResetTransform.addEventListener('click', () => {
-    userOffsetX = 0;
-    userOffsetY = 0;
-    userScale = 1.0;
-    userRotateZ = 0;
-    userRotateX = 0;
-    userRotateY = 0;
-    is3dMode = false;
-    if (btnToggle3d) {
-      btnToggle3d.classList.remove('is-active');
-      btnToggle3d.setAttribute('aria-pressed', 'false');
-    }
-    if (isPaused) {
-      isPaused = false;
-      if (btnTogglePause) {
-        btnTogglePause.classList.remove('is-paused');
-        btnTogglePause.setAttribute('aria-pressed', 'false');
-        btnTogglePause.textContent = '⏸';
-      }
-      if (arContent) arContent.classList.remove('is-paused');
-      if (originalGifSrc && arMediaPreview) arMediaPreview.src = originalGifSrc;
-      if (is3dModel && ar3dModel) {
-        ar3dModel.setAttribute('auto-rotate', '');
-        if (typeof ar3dModel.play === 'function') ar3dModel.play();
-      }
-    }
-    updateScaleDisplay();
-    applyArTransform();
   });
 }
 

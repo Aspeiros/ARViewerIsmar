@@ -9,8 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tsukimi+Rounded:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="./src/styles.css?v=11" />
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <link rel="stylesheet" href="./src/styles.css?v=17" />
   </head>
   <body>
     <main class="experience" aria-live="polite">
@@ -57,7 +56,10 @@
       <section class="camera-ui" id="camera-ui" hidden>
         <header class="camera-header">
           <img src="./GraphicResources/Banners_&_logo/Logo_&_wordmark.svg" alt="ISMAR 2026" />
-          <button class="icon-button" id="switch-camera" type="button" aria-label="Switch camera" title="Switch camera">↺</button>
+          <div class="header-actions">
+            <button class="icon-button" id="btn-toggle-pause" type="button" aria-label="Pause animation" title="Pause / Resume animation">⏸</button>
+            <button class="icon-button" id="switch-camera" type="button" aria-label="Switch camera" title="Switch camera">↺</button>
+          </div>
         </header>
 
         <div class="tracking-hint" id="tracking-hint">
@@ -69,17 +71,8 @@
           <i></i><i></i><i></i><i></i>
         </div>
 
-        <article class="ar-content" id="ar-content" hidden>
-          <span class="ar-spark ar-spark-one">✦</span>
-          <span class="ar-spark ar-spark-two">✦</span>
-          <div class="ar-orb" id="ar-orb">AR</div>
-          <img id="ar-media-preview" class="ar-media-preview" hidden alt="AR Media" />
-          <model-viewer id="ar-3d-model" class="ar-3d-model" hidden auto-rotate camera-controls shadow-intensity="1" exposure="1" interaction-prompt="none" alt="ISMAR 3D Model"></model-viewer>
-          <div class="ar-text-group">
-            <p class="ar-kicker">ISMAR 2026</p>
-            <h2 id="content-title">Welcome to Bari</h2>
-            <p id="content-description">Your XR venue journey starts here.</p>
-          </div>
+        <article class="ar-content is-media-only" id="ar-content" hidden>
+          <img id="ar-media-preview" class="ar-media-preview" src="./media/images/Logo_Animated.gif" alt="ISMAR 2026 Animated Logo" />
         </article>
 
         <!-- Live ISMAR Frame Preview -->
@@ -135,53 +128,10 @@
           </div>
         </div>
 
-        <!-- Interactive Frame Selector Drawer -->
-        <div class="frame-drawer is-hidden" id="frame-drawer" role="radiogroup" aria-label="Select frame style">
-          <button class="frame-option is-active" data-style="classic" type="button" role="radio" aria-checked="true">
-            <span class="frame-swatch swatch-classic" aria-hidden="true"></span>
-            <span class="frame-opt-name" data-i18n="frameClassic">Classic</span>
-          </button>
-          <button class="frame-option" data-style="minimal" type="button" role="radio" aria-checked="false">
-            <span class="frame-swatch swatch-minimal" aria-hidden="true"></span>
-            <span class="frame-opt-name" data-i18n="frameMinimal">Minimal</span>
-          </button>
-          <button class="frame-option" data-style="puglia" type="button" role="radio" aria-checked="false">
-            <span class="frame-swatch swatch-puglia" aria-hidden="true"></span>
-            <span class="frame-opt-name" data-i18n="framePuglia">Puglia</span>
-          </button>
-          <button class="frame-option" data-style="cyber" type="button" role="radio" aria-checked="false">
-            <span class="frame-swatch swatch-cyber" aria-hidden="true"></span>
-            <span class="frame-opt-name" data-i18n="frameCyber">Cyber XR</span>
-          </button>
-          <button class="frame-option" data-style="none" type="button" role="radio" aria-checked="false">
-            <span class="frame-swatch swatch-none" aria-hidden="true"></span>
-            <span class="frame-opt-name" data-i18n="frameNone">No frame</span>
-          </button>
-        </div>
-
-        <div class="ar-tools-wrapper" id="ar-tools-wrapper">
-          <button class="btn-toggle-tools" id="btn-toggle-tools" type="button" aria-expanded="false" aria-label="Toggle transformation controls">
-            <span class="tools-icon">✨</span>
-            <span class="tools-label" id="tools-label" data-i18n="btnAdjustTools">Adjust</span>
-          </button>
-          <div class="ar-transform-bar is-collapsed" id="ar-transform-bar" aria-label="AR scale, rotation and 3D controls">
-            <button class="ar-tool-btn" id="btn-zoom-out" type="button" aria-label="Zoom out" title="Make smaller">−</button>
-            <span class="ar-scale-badge" id="ar-scale-badge">100%</span>
-            <button class="ar-tool-btn" id="btn-zoom-in" type="button" aria-label="Zoom in" title="Make bigger">+</button>
-            <span class="ar-tool-divider" aria-hidden="true"></span>
-            <button class="ar-tool-btn" id="btn-rot-left" type="button" aria-label="Rotate left" title="Rotate left 15°">↶</button>
-            <button class="ar-tool-btn" id="btn-rot-right" type="button" aria-label="Rotate right" title="Rotate right 15°">↷</button>
-            <button class="ar-tool-btn ar-tool-3d" id="btn-toggle-3d" type="button" aria-label="Toggle 3D tilt mode" title="3D Tilt Mode">3D</button>
-            <span class="ar-tool-divider" aria-hidden="true"></span>
-            <button class="ar-tool-btn ar-tool-pause" id="btn-toggle-pause" type="button" aria-label="Pause animation" title="Pause / Resume animation">⏸</button>
-            <button class="ar-tool-btn ar-tool-reset" id="btn-reset-transform" type="button" aria-label="Reset position, scale and rotation" title="Reset">↺</button>
-          </div>
-        </div>
-
         <nav class="camera-controls" aria-label="Camera controls">
-          <button class="frame-toggle is-active" id="frame-toggle" type="button" aria-pressed="true" aria-label="Switch frame style">
+          <button class="control-btn frame-toggle is-active" id="frame-toggle" type="button" aria-pressed="true" aria-label="Switch frame style">
             <span class="frame-swatch swatch-classic" id="frame-swatch" aria-hidden="true"></span>
-            <span id="frame-toggle-text">Classic</span>
+            <span id="frame-toggle-text" class="control-btn-label">Classic</span>
           </button>
           <div class="shutter-col">
             <div class="mode-switch-pill" id="mode-switch-pill" role="tablist" aria-label="Capture mode">
@@ -197,7 +147,10 @@
               <span class="shutter-countdown-text" id="shutter-countdown" hidden>6s</span>
             </button>
           </div>
-          <button class="secondary-control" id="reset-marker" type="button" data-i18n="recalibrate">Recalibrate</button>
+          <button class="control-btn reset-marker-btn" id="reset-marker" type="button" aria-label="Recalibrate position">
+            <span class="control-btn-icon" aria-hidden="true">🎯</span>
+            <span id="reset-marker-text" class="control-btn-label" data-i18n="recalibrate">Re-center</span>
+          </button>
         </nav>
       </section>
 
@@ -216,6 +169,6 @@
 
       <p class="message" id="message" role="status"></p>
     </main>
-    <script type="module" src="./src/app.js?v=16"></script>
+    <script type="module" src="./src/app.js?v=17"></script>
   </body>
 </html>
